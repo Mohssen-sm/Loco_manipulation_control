@@ -1,0 +1,4 @@
+<launch>
+      <node pkg="plotjuggler" type="plotjuggler" name="my_plot_Juggler" args="--layout /home/mohsen/new.xml"/>
+
+</launch>

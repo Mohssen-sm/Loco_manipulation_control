@@ -1,0 +1,357 @@
+#include "../../include/interface/IOROS.h"
+#include "../../include/interface/KeyBoard.h"
+#include <iostream>
+#include <unistd.h>
+#include <csignal>
+
+inline void RosShutDown(int sig){
+	ROS_INFO("ROS interface shutting down!");
+	ros::shutdown();
+}
+
+IOROS::IOROS(std::string robot_name):IOInterface()
+{
+    // int argc; char **argv;
+    // ros::init(argc, argv, "unitree_gazebo_servo");
+    std::cout << "The control interface for ROS Gazebo simulation" << std::endl;
+    _robot_name = robot_name;
+    std::cout << "robot_name: " << _robot_name << std::endl;
+    
+    if(robot_name == "a1") _camera_link_length = 0.24;
+    if(robot_name == "aliengo") _camera_link_length = 0.35;
+    // start subscriber
+    initRecv();
+    ros::AsyncSpinner subSpinner(1); // one threads
+    subSpinner.start();
+    usleep(3000);     //wait for subscribers start
+    // initialize publisher
+    initSend();   
+
+    signal(SIGINT, RosShutDown);
+
+    cmdPanel = new KeyBoard();
+}
+
+IOROS::~IOROS(){
+    ros::shutdown();
+}
+
+void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
+    sendCmd(cmd);
+    recvState(state);
+
+    state->userCmd = cmdPanel->getUserCmd();
+    state->userValue = cmdPanel->getUserValue();
+    
+    for (int i = 0; i < 3; i++)
+    {
+        state->userValue.manipulation_force[i] = Highcmd.manipulation_force[i];
+    }
+        state->userValue.vx = Highcmd.velocity[0];
+        state->userValue.vy = Highcmd.velocity[1];
+        state->userValue.turn_rate = Highcmd.omega[2];
+}
+
+void IOROS::sendCmd(const LowlevelCmd *lowCmd){
+    for(int i = 0; i < 12; i++){
+        _lowCmd.motorCmd[i].mode = 0X0A; // alwasy set it to 0X0A
+        _lowCmd.motorCmd[i].q = lowCmd->motorCmd[i].q;
+        _lowCmd.motorCmd[i].dq = lowCmd->motorCmd[i].dq;
+        _lowCmd.motorCmd[i].tau = lowCmd->motorCmd[i].tau;
+        _lowCmd.motorCmd[i].Kd = lowCmd->motorCmd[i].Kd;
+        _lowCmd.motorCmd[i].Kp = lowCmd->motorCmd[i].Kp;
+        
+    }
+    // std::cout <<  _lowCmd.motorCmd[0].Kd << " " << _lowCmd.motorCmd[0].q << std::endl;
+    for(int m = 0; m < 12; m++){
+        _servo_pub[m].publish(_lowCmd.motorCmd[m]);
+    }
+    ros::spinOnce();
+
+}
+
+void IOROS::recvState(LowlevelState *state){
+    for(int i = 0; i < 12; i++){
+        state->motorState[i].q = _lowState.motorState[i].q;
+        state->motorState[i].dq = _lowState.motorState[i].dq;
+        state->motorState[i].tauEst = _lowState.motorState[i].tauEst;
+    }
+    for(int i = 0; i < 3; i++){
+        state->imu.quaternion[i] = _lowState.imu.quaternion[i];
+        state->imu.accelerometer[i] = _lowState.imu.accelerometer[i];
+        state->imu.gyroscope[i] = _lowState.imu.gyroscope[i];
+    }
+    state->imu.quaternion[3] = _lowState.imu.quaternion[3];
+
+    for(int i = 0; i < 4; i++){
+        state->FootForce[i] = _lowState.footForce[i];
+    }
+
+    state->position[0] = _lowState.position.x;
+    state->position[1] = _lowState.position.y;
+
+    state->vWorld[0] = _lowState.velocity.x;
+    state->vWorld[1] = _lowState.velocity.y;
+    state->vWorld[2] = _lowState.velocity.z;
+
+    _currentTime = ros::Time::now();
+
+    _trunkTF.header.stamp = _currentTime;
+    _trunkTF.header.frame_id = "map";
+    _trunkTF.child_frame_id = "base";
+
+    _trunkTF.transform.translation.x = _lowState.position.x;
+    _trunkTF.transform.translation.y = _lowState.position.y;
+    _trunkTF.transform.translation.z = _lowState.position.z;
+
+    _trunkTF.transform.rotation.w = state->imu.quaternion[0];
+    _trunkTF.transform.rotation.x = state->imu.quaternion[1];
+    _trunkTF.transform.rotation.y = state->imu.quaternion[2];
+    _trunkTF.transform.rotation.z = state->imu.quaternion[3];
+    _trunkTF_broadcaster.sendTransform(_trunkTF);
+
+    // _camTF.header.stamp = _currentTime;
+    // _camTF.header.frame_id = "base";
+    // _camTF.child_frame_id = "rs_link";
+
+    // _camTF.transform.translation.x = _camera_link_length;
+    // _camTF.transform.translation.y = 0.0;
+    // _camTF.transform.translation.z = 0.0;
+
+    // _camTF.transform.rotation.w = 1.0;
+    // _camTF.transform.rotation.x = 0.0;
+    // _camTF.transform.rotation.y = 0.0;
+    // _camTF.transform.rotation.z = 0.0;    
+
+    // _camTF_broadcaster.sendTransform(_camTF);
+
+    _poseMsg.header.stamp=_currentTime;
+    _poseMsg.header.frame_id = "base";
+
+    _poseMsg.pose.pose.position.x = _lowState.position.x;
+    _poseMsg.pose.pose.position.y = _lowState.position.y;
+    _poseMsg.pose.pose.position.z = _lowState.position.z;
+    _poseMsg.pose.covariance = _odom_pose_covariance;
+
+    _poseMsg.pose.pose.orientation.w = state->imu.quaternion[0];
+    _poseMsg.pose.pose.orientation.x = state->imu.quaternion[1];
+    _poseMsg.pose.pose.orientation.y = state->imu.quaternion[2];
+    _poseMsg.pose.pose.orientation.z = state->imu.quaternion[3];
+
+    _pose_pub.publish(_poseMsg);
+
+}
+
+void IOROS::initSend(){
+    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_hip_controller/command", 1);
+    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_thigh_controller/command", 1);
+    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_calf_controller/command", 1);
+    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FL_hip_controller/command", 1);
+    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FL_thigh_controller/command", 1);
+    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FL_calf_controller/command", 1);
+    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RR_hip_controller/command", 1);
+    _servo_pub[7] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RR_thigh_controller/command", 1);
+    _servo_pub[8] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RR_calf_controller/command", 1);
+    _servo_pub[9] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RL_hip_controller/command", 1);
+    _servo_pub[10] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RL_thigh_controller/command", 1);
+    _servo_pub[11] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RL_calf_controller/command", 1);
+    _pose_pub = _nm.advertise<geometry_msgs::PoseWithCovarianceStamped>("/"+_robot_name + "/pose", 50);
+}
+
+void IOROS::initRecv(){
+    _imu_sub = _nm.subscribe( "/" + _robot_name + "_gazebo/trunk_imu", 1, &IOROS::imuCallback, this);
+    _state_sub = _nm.subscribe("/gazebo/model_states", 1, &IOROS::StateCallback, this);
+    _servo_sub[0] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
+    _servo_sub[1] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
+    _servo_sub[2] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_calf_controller/state", 1, &IOROS::FRcalfCallback, this);
+    _servo_sub[3] = _nm.subscribe("/" + _robot_name + "_gazebo/FL_hip_controller/state", 1, &IOROS::FLhipCallback, this);
+    _servo_sub[4] = _nm.subscribe("/" + _robot_name + "_gazebo/FL_thigh_controller/state", 1, &IOROS::FLthighCallback, this);
+    _servo_sub[5] = _nm.subscribe("/" + _robot_name + "_gazebo/FL_calf_controller/state", 1, &IOROS::FLcalfCallback, this);
+    _servo_sub[6] = _nm.subscribe("/" + _robot_name + "_gazebo/RR_hip_controller/state", 1, &IOROS::RRhipCallback, this);
+    _servo_sub[7] = _nm.subscribe("/" + _robot_name + "_gazebo/RR_thigh_controller/state", 1, &IOROS::RRthighCallback, this);
+    _servo_sub[8] = _nm.subscribe("/" + _robot_name + "_gazebo/RR_calf_controller/state", 1, &IOROS::RRcalfCallback, this);
+    _servo_sub[9] = _nm.subscribe("/" + _robot_name + "_gazebo/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
+    _servo_sub[10] = _nm.subscribe("/" + _robot_name + "_gazebo/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
+    _servo_sub[11] = _nm.subscribe("/" + _robot_name + "_gazebo/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
+
+    _foot_force_sub[0] = _nm.subscribe("/visual/" + _robot_name +"_gazebo/FR_foot_contact/the_force", 1, &IOROS::FRfootCallback, this);
+    _foot_force_sub[1] = _nm.subscribe("/visual/" + _robot_name +"_gazebo/FL_foot_contact/the_force", 1, &IOROS::FLfootCallback, this);
+    _foot_force_sub[2] = _nm.subscribe("/visual/" + _robot_name +"_gazebo/RR_foot_contact/the_force", 1, &IOROS::RRfootCallback, this);
+    _foot_force_sub[3] = _nm.subscribe("/visual/" + _robot_name +"_gazebo/RL_foot_contact/the_force", 1, &IOROS::RLfootCallback, this);
+
+    _manipulation_force_sub = _nm.subscribe("/" + _robot_name + "_gazebo/manipulation_force", 1, &IOROS::ManiForceCallback, this);
+    _object_sub = _nm.subscribe("/" + _robot_name + "_gazebo/cmd_vel", 1, &IOROS::cmdvelCallback, this);
+}
+
+void IOROS::StateCallback(const gazebo_msgs::ModelStates & msg)
+{
+    int robot_index;
+    // std::cout << msg.name.size() << std::endl;
+    for(int i = 0; i < msg.name.size(); i++)
+    {
+        if(msg.name[i] == _robot_name + "_gazebo")
+        {
+            robot_index = i;
+            // std::cout << msg.name[i] << std::endl;
+        }
+    }
+
+    _lowState.position.x = msg.pose[robot_index].position.x;
+    _lowState.position.y = msg.pose[robot_index].position.y;
+    _lowState.position.z = msg.pose[robot_index].position.z;
+
+    _lowState.velocity.x = msg.twist[robot_index].linear.x;
+    _lowState.velocity.y = msg.twist[robot_index].linear.y;
+    _lowState.velocity.z = msg.twist[robot_index].linear.z;
+}
+
+void IOROS::imuCallback(const sensor_msgs::Imu & msg)
+{ 
+    _lowState.imu.quaternion[0] = msg.orientation.w;
+    _lowState.imu.quaternion[1] = msg.orientation.x;
+    _lowState.imu.quaternion[2] = msg.orientation.y;
+    _lowState.imu.quaternion[3] = msg.orientation.z;
+
+    _lowState.imu.gyroscope[0] = msg.angular_velocity.x;
+    _lowState.imu.gyroscope[1] = msg.angular_velocity.y;
+    _lowState.imu.gyroscope[2] = msg.angular_velocity.z;
+    
+    _lowState.imu.accelerometer[0] = msg.linear_acceleration.x;
+    _lowState.imu.accelerometer[1] = msg.linear_acceleration.y;
+    _lowState.imu.accelerometer[2] = msg.linear_acceleration.z;
+}
+
+void IOROS::FRhipCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[0].mode = msg.mode;
+    _lowState.motorState[0].q = msg.q;
+    _lowState.motorState[0].dq = msg.dq;
+    _lowState.motorState[0].tauEst = msg.tauEst;
+}
+
+void IOROS::FRthighCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[1].mode = msg.mode;
+    _lowState.motorState[1].q = msg.q;
+    _lowState.motorState[1].dq = msg.dq;
+    _lowState.motorState[1].tauEst = msg.tauEst;
+}
+
+void IOROS::FRcalfCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[2].mode = msg.mode;
+    _lowState.motorState[2].q = msg.q;
+    _lowState.motorState[2].dq = msg.dq;
+    _lowState.motorState[2].tauEst = msg.tauEst;
+}
+
+void IOROS::FLhipCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[3].mode = msg.mode;
+    _lowState.motorState[3].q = msg.q;
+    _lowState.motorState[3].dq = msg.dq;
+    _lowState.motorState[3].tauEst = msg.tauEst;
+}
+
+void IOROS::FLthighCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[4].mode = msg.mode;
+    _lowState.motorState[4].q = msg.q;
+    _lowState.motorState[4].dq = msg.dq;
+    _lowState.motorState[4].tauEst = msg.tauEst;
+}
+
+void IOROS::FLcalfCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[5].mode = msg.mode;
+    _lowState.motorState[5].q = msg.q;
+    _lowState.motorState[5].dq = msg.dq;
+    _lowState.motorState[5].tauEst = msg.tauEst;
+}
+
+void IOROS::RRhipCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[6].mode = msg.mode;
+    _lowState.motorState[6].q = msg.q;
+    _lowState.motorState[6].dq = msg.dq;
+    _lowState.motorState[6].tauEst = msg.tauEst;
+}
+
+void IOROS::RRthighCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[7].mode = msg.mode;
+    _lowState.motorState[7].q = msg.q;
+    _lowState.motorState[7].dq = msg.dq;
+    _lowState.motorState[7].tauEst = msg.tauEst;
+}
+
+void IOROS::RRcalfCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[8].mode = msg.mode;
+    _lowState.motorState[8].q = msg.q;
+    _lowState.motorState[8].dq = msg.dq;
+    _lowState.motorState[8].tauEst = msg.tauEst;
+}
+
+void IOROS::RLhipCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[9].mode = msg.mode;
+    _lowState.motorState[9].q = msg.q;
+    _lowState.motorState[9].dq = msg.dq;
+    _lowState.motorState[9].tauEst = msg.tauEst;
+}
+
+void IOROS::RLthighCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[10].mode = msg.mode;
+    _lowState.motorState[10].q = msg.q;
+    _lowState.motorState[10].dq = msg.dq;
+    _lowState.motorState[10].tauEst = msg.tauEst;
+}
+
+void IOROS::RLcalfCallback(const unitree_legged_msgs::MotorState& msg)
+{
+    _lowState.motorState[11].mode = msg.mode;
+    _lowState.motorState[11].q = msg.q;
+    _lowState.motorState[11].dq = msg.dq;
+    _lowState.motorState[11].tauEst = msg.tauEst;
+}
+
+void IOROS::FRfootCallback(const geometry_msgs::WrenchStamped& msg)
+{
+    _lowState.footForce[0] = msg.wrench.force.z;
+}
+
+void IOROS::FLfootCallback(const geometry_msgs::WrenchStamped& msg)
+{
+    _lowState.footForce[1] = msg.wrench.force.z;
+}
+
+void IOROS::RRfootCallback(const geometry_msgs::WrenchStamped& msg)
+{
+    _lowState.footForce[2] = msg.wrench.force.z;
+}
+
+void IOROS::RLfootCallback(const geometry_msgs::WrenchStamped& msg)
+{
+    _lowState.footForce[3] = msg.wrench.force.z;
+}
+
+void IOROS::ManiForceCallback(const geometry_msgs::Wrench& msg)
+{
+    Highcmd.manipulation_force[0] = msg.force.x;
+    Highcmd.manipulation_force[1] = msg.force.y;
+    Highcmd.manipulation_force[2] = msg.force.z;
+}
+
+void IOROS::cmdvelCallback(const geometry_msgs::Twist& msg)
+{
+  Highcmd.velocity[0] = msg.linear.x;
+  Highcmd.velocity[1] = msg.linear.y;
+  Highcmd.velocity[2] = msg.linear.z;
+
+  Highcmd.omega[0] = msg.angular.x;
+  Highcmd.omega[1] = msg.angular.y;
+  Highcmd.omega[2] = msg.angular.z;
+//   ROS_INFO("I heard: x =%f, y=%f, z=%f", msg.pose[robot_index].position.x, msg.pose[robot_index].position.y, msg.pose[robot_index].position.z);
+}
