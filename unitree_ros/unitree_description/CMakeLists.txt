@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
     a1_description
     aliengo_description
     go1_description
+    unitree_legged_msgs
+    unitree_legged_control
+    unitree_gazebo
 )
 
 catkin_package(

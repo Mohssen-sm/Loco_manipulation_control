@@ -13,5 +13,8 @@
     <depend>a1_description</depend>
     <depend>aliengo_description</depend>
     <depend>go1_description</depend>
+    <depend>unitree_legged_control</depend>
+    <depend>unitree_legged_msgs</depend>
+    <depend>unitree_gazebo</depend>
 
 </package>

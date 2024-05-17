@@ -1,6 +1,5 @@
 <launch>
     <arg name="gui" default="true" />
-    <arg name="wname" default="empty_world" />
     <arg name="robot_type" default="aliengo" />
     <arg name="ns_1" default="alien1" />
     <arg name="ns_2" default="alien2" />
@@ -25,7 +24,8 @@
                   RR_hip_controller RR_thigh_controller RR_calf_controller " />
 
         <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"
-            respawn="false" output="screen">
+            respawn="false" output="screen"
+            args= "tf_prefix new">
             <remap from="/joint_states" to="joint_states" />
         </node>
     </group>
