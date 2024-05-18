@@ -1,0 +1,33 @@
+<launch>
+    <arg name="robot_type" default="aliengo" />
+    <arg name="ns" default="" />
+    <arg name="x_pos" default="0.0" />
+    <arg name="y_pos" default="0.0" />
+    <arg name="yaw_angle" default="0.0" />
+
+    <group ns="$(arg ns)">
+        <param name="robot_description"
+            command="$(find xacro)/xacro $(find unitree_description)/xacro/robot.xacro 
+           ns:=$(arg ns) robot_type:=$(arg robot_type)" />
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
+            args="-x $(arg x_pos) -y $(arg y_pos) -z 0.5 -Y $(arg yaw_angle) -param robot_description 
+            -urdf -model $(arg ns)" output="screen" />
+
+        <rosparam file="$(find unitree_description)/config/robot_control.yaml" command="load" />
+
+        <node pkg="controller_manager" type="spawner" name="controller_spawner" respawn="false"
+            output="screen"
+            args="joint_state_controller
+                  FL_hip_controller FL_thigh_controller FL_calf_controller
+                  FR_hip_controller FR_thigh_controller FR_calf_controller
+                  RL_hip_controller RL_thigh_controller RL_calf_controller
+                  RR_hip_controller RR_thigh_controller RR_calf_controller" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"
+            respawn="false" output="screen">
+            <remap from="/joint_states" to="joint_states" />
+        </node>
+    </group>
+
+</launch>

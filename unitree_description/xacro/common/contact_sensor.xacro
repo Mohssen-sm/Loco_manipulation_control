@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="contact">
+    <xacro:macro name="CONTACT" params="link_name prefix ns ">
+        <gazebo reference="${link_name}">
+            <sensor name="${link_name}_foot_contact" type="contact">
+                <update_rate>1000</update_rate>
+                <plugin name="contactPlugin" filename="libunitreeFootContactPlugin.so">
+                    <robotNamespace>/${ns}</robotNamespace>
+                </plugin>
+                <contact>
+                    <collision>${prefix}_calf_fixed_joint_lump__${prefix}_foot_collision_1</collision>
+                </contact>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>

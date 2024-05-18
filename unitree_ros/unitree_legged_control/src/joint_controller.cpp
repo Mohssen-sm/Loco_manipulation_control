@@ -53,10 +53,18 @@ namespace unitree_legged_control
         // rqtTune = false;
         sensor_torque = 0;
         name_space = n.getNamespace();
+
+        std::string ns = "";
+        size_t pos = name_space.find("/", 1);
+        if (pos != std::string::npos)
+           ns = name_space.substr(1, pos-1);
+        
         if (!n.getParam("joint", joint_name)){
             ROS_ERROR("No joint given in namespace: '%s')", n.getNamespace().c_str());
             return false;
         }
+
+        joint_name = ns + "_" + joint_name;
         
         // load pid param from ymal only if rqt need 
         // if(rqtTune) {
@@ -77,10 +85,10 @@ namespace unitree_legged_control
             ROS_ERROR("Could not find joint '%s' in urdf", joint_name.c_str());
             return false;
         }
-        if(joint_name == "FR_hip_joint" || joint_name == "FL_hip_joint" || joint_name == "RR_hip_joint" || joint_name == "RL_hip_joint"){
+        if(joint_name.find("hip_joint")){
             isHip = true;
         }
-        if(joint_name == "FR_calf_joint" || joint_name == "FL_calf_joint" || joint_name == "RR_calf_joint" || joint_name == "RL_calf_joint"){
+        if(joint_name.find("calf_joint")){
             isCalf = true;
         }        
         joint = robot->getHandle(joint_name);
