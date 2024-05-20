@@ -174,7 +174,7 @@ void LinearKFPositionVelocityEstimator::run() {
 void CheaterPositionVelocityEstimator::run() {
   this->_stateEstimatorData.result->position[0] = this->_stateEstimatorData.lowState->position[0];
   this->_stateEstimatorData.result->position[1] = this->_stateEstimatorData.lowState->position[1];
-  // this->_stateEstimatorData.result->position[2] = this->_stateEstimatorData.lowState->position[2];
+  this->_stateEstimatorData.result->position[2] = this->_stateEstimatorData.lowState->position[2];
 
   this->_stateEstimatorData.result->vWorld[0] = this->_stateEstimatorData.lowState->vWorld[0];
   this->_stateEstimatorData.result->vWorld[1] = this->_stateEstimatorData.lowState->vWorld[1];

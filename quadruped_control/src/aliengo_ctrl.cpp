@@ -39,7 +39,6 @@ int main(int argc, char **argv)
 
     stateEstimator->addEstimator<ContactEstimator>();
     stateEstimator->addEstimator<VectorNavOrientationEstimator>();
-    stateEstimator->addEstimator<TunedKFPositionVelocityEstimator>();
     stateEstimator->addEstimator<CheaterPositionVelocityEstimator>();
     DesiredStateCommand *desiredStateCommand = new DesiredStateCommand(&stateEstimate, dt);
 
