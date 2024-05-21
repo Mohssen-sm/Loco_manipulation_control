@@ -35,9 +35,10 @@ void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
     state->userCmd = cmdPanel->getUserCmd();
     state->userValue = cmdPanel->getUserValue();
     
-    for (int i = 0; i < 3; i++)
+    
+    for (int i = 0; i < 2; i++)
     {
-        state->userValue.manipulation_force[i] = Highcmd.manipulation_force[i];
+        state->userValue.manipulation_force[i] = Highcmd.manipulation_force(i);
     }
         state->userValue.vx = Highcmd.velocity[0];
         state->userValue.vy = Highcmd.velocity[1];
@@ -157,7 +158,7 @@ void IOROS::initRecv(){
     _foot_force_sub[2] = _nm.subscribe("visual/RR_foot_contact/the_force", 1, &IOROS::RRfootCallback, this);
     _foot_force_sub[3] = _nm.subscribe("visual/RL_foot_contact/the_force", 1, &IOROS::RLfootCallback, this);
 
-    _manipulation_force_sub = _nm.subscribe("manipulation_force", 1, &IOROS::ManiForceCallback, this);
+    _manipulation_force_sub = _nm.subscribe("wrench", 1, &IOROS::ManiForceCallback, this);
     _object_sub = _nm.subscribe("cmd_vel", 1, &IOROS::cmdvelCallback, this);
 }
 
@@ -188,6 +189,9 @@ void IOROS::imuCallback(const sensor_msgs::Imu & msg)
     _lowState.imu.quaternion[1] = msg.orientation.x;
     _lowState.imu.quaternion[2] = msg.orientation.y;
     _lowState.imu.quaternion[3] = msg.orientation.z;
+
+    Eigen::Quaterniond quat(msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z);
+    rotmat = quat.toRotationMatrix();
 
     _lowState.imu.gyroscope[0] = msg.angular_velocity.x;
     _lowState.imu.gyroscope[1] = msg.angular_velocity.y;
@@ -316,9 +320,9 @@ void IOROS::RLfootCallback(const geometry_msgs::WrenchStamped& msg)
 
 void IOROS::ManiForceCallback(const geometry_msgs::Wrench& msg)
 {
-    Highcmd.manipulation_force[0] = msg.force.x;
-    Highcmd.manipulation_force[1] = msg.force.y;
-    Highcmd.manipulation_force[2] = msg.force.z;
+    Eigen::Vector3d force_body = (Eigen::Vector3d() << msg.force.x, msg.force.y, msg.force.z).finished();
+    Highcmd.manipulation_force = rotmat * force_body;
+    // ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.manipulation_force[0], Highcmd.manipulation_force[1], Highcmd.manipulation_force[2]);
 }
 
 void IOROS::cmdvelCallback(const geometry_msgs::Twist& msg)

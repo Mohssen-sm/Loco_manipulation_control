@@ -9,7 +9,7 @@ struct HighlevelCmd
 {
     float velocity[3];
     float omega[3];
-    float manipulation_force[3];
+    Vec3<double> manipulation_force;
 
     HighlevelCmd()
     {
@@ -18,7 +18,7 @@ struct HighlevelCmd
         {
             velocity[i] = 0;
             omega[i] = 0;
-            manipulation_force[i] = 0;
+            manipulation_force(i) = 0;
         }
     }
 };

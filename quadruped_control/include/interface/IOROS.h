@@ -37,6 +37,7 @@ class IOROS : public IOInterface
         ros::Time _currentTime;
         geometry_msgs::TransformStamped _trunkTF;
         tf::TransformBroadcaster _trunkTF_broadcaster;
+        Eigen::Matrix3d rotmat;
 
         geometry_msgs::PoseWithCovarianceStamped _poseMsg;
 
