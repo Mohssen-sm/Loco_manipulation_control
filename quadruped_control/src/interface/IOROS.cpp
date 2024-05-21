@@ -89,6 +89,20 @@ void IOROS::recvState(LowlevelState *state){
 
     _currentTime = ros::Time::now();
 
+    _trunkTF.header.stamp = _currentTime;
+    _trunkTF.header.frame_id = "world";
+    _trunkTF.child_frame_id = _nm.getNamespace().substr(1) + "_base";
+
+    _trunkTF.transform.translation.x = _lowState.position.x;
+    _trunkTF.transform.translation.y = _lowState.position.y;
+    _trunkTF.transform.translation.z = _lowState.position.z;
+
+    _trunkTF.transform.rotation.w = state->imu.quaternion[0];
+    _trunkTF.transform.rotation.x = state->imu.quaternion[1];
+    _trunkTF.transform.rotation.y = state->imu.quaternion[2];
+    _trunkTF.transform.rotation.z = state->imu.quaternion[3];
+    _trunkTF_broadcaster.sendTransform(_trunkTF);
+
     _poseMsg.header.stamp=_currentTime;
     _poseMsg.header.frame_id = "base";
 

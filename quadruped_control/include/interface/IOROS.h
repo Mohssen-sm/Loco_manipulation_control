@@ -36,9 +36,7 @@ class IOROS : public IOInterface
         
         ros::Time _currentTime;
         geometry_msgs::TransformStamped _trunkTF;
-        geometry_msgs::TransformStamped _camTF;
         tf::TransformBroadcaster _trunkTF_broadcaster;
-        tf::TransformBroadcaster _camTF_broadcaster;
 
         geometry_msgs::PoseWithCovarianceStamped _poseMsg;
 
