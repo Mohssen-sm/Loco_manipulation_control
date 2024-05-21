@@ -40,9 +40,9 @@ void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
     {
         state->userValue.manipulation_force[i] = Highcmd.manipulation_force(i);
     }
-        state->userValue.vx = Highcmd.velocity[0];
-        state->userValue.vy = Highcmd.velocity[1];
-        state->userValue.turn_rate = Highcmd.omega[2];
+        state->userValue.vx = 0.0;
+        state->userValue.vy = Highcmd.velocity_cmd[1];
+        state->userValue.turn_rate = Highcmd.omega_cmd[2];
 }
 
 void IOROS::sendCmd(const LowlevelCmd *lowCmd){
@@ -327,12 +327,9 @@ void IOROS::ManiForceCallback(const geometry_msgs::Wrench& msg)
 
 void IOROS::cmdvelCallback(const geometry_msgs::Twist& msg)
 {
-  Highcmd.velocity[0] = msg.linear.x;
-  Highcmd.velocity[1] = msg.linear.y;
-  Highcmd.velocity[2] = msg.linear.z;
+  Eigen::Vector3d cmd_world = (Eigen::Vector3d() << msg.linear.x, msg.linear.y, 0.0).finished();
+  Highcmd.velocity_cmd = rotmat.transpose() * cmd_world;
+  Highcmd.omega_cmd[2] = msg.angular.z;
 
-  Highcmd.omega[0] = msg.angular.x;
-  Highcmd.omega[1] = msg.angular.y;
-  Highcmd.omega[2] = msg.angular.z;
-//   ROS_INFO("I heard: x =%f, y=%f, z=%f", msg.pose[robot_index].position.x, msg.pose[robot_index].position.y, msg.pose[robot_index].position.z);
+  ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
 }

@@ -7,17 +7,17 @@
 
 struct HighlevelCmd
 {
-    float velocity[3];
-    float omega[3];
     Vec3<double> manipulation_force;
+    Vec3<double> velocity_cmd;
+    Vec3<double> omega_cmd;
 
     HighlevelCmd()
     {
 
         for (int i = 0; i < 3; i++)
         {
-            velocity[i] = 0;
-            omega[i] = 0;
+            velocity_cmd(i) = 0;
+            omega_cmd(i) = 0;
             manipulation_force(i) = 0;
         }
     }
