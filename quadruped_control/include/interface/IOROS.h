@@ -26,7 +26,7 @@ class IOROS : public IOInterface
         void sendCmd(const LowlevelCmd *cmd);
         void recvState(LowlevelState *state);
         ros::NodeHandle _nm;
-        ros::Subscriber _servo_sub[12], _imu_sub, _state_sub, _foot_force_sub[4], _manipulation_force_sub, _object_sub;
+        ros::Subscriber _servo_sub[12], _imu_sub, _state_sub, _foot_force_sub[4], _manipulation_force_sub, _object_sub[2];
         ros::Publisher _servo_pub[12], _pose_pub;
         unitree_legged_msgs::LowCmd _lowCmd;
         unitree_legged_msgs::LowState _lowState;
@@ -71,6 +71,7 @@ class IOROS : public IOInterface
 
         void ManiForceCallback(const geometry_msgs::Wrench& msg);
         void cmdvelCallback(const geometry_msgs::Twist& msg);
+        void poseCallback(const geometry_msgs::Pose& msg);
 
         boost::array<double, 36> _odom_pose_covariance = {1e-9, 0, 0, 0, 0, 0, 
                                         0, 1e-3, 1e-9, 0, 0, 0, 

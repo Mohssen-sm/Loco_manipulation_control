@@ -159,7 +159,8 @@ void IOROS::initRecv(){
     _foot_force_sub[3] = _nm.subscribe("visual/RL_foot_contact/the_force", 1, &IOROS::RLfootCallback, this);
 
     _manipulation_force_sub = _nm.subscribe("wrench", 1, &IOROS::ManiForceCallback, this);
-    _object_sub = _nm.subscribe("cmd_vel", 1, &IOROS::cmdvelCallback, this);
+    _object_sub[0] = _nm.subscribe("cmd_vel", 1, &IOROS::cmdvelCallback, this);
+    _object_sub[1] = _nm.subscribe("contactPoint", 1, &IOROS::poseCallback, this);
 }
 
 void IOROS::StateCallback(const gazebo_msgs::ModelStates & msg)
@@ -327,9 +328,18 @@ void IOROS::ManiForceCallback(const geometry_msgs::Wrench& msg)
 
 void IOROS::cmdvelCallback(const geometry_msgs::Twist& msg)
 {
-  Eigen::Vector3d cmd_world = (Eigen::Vector3d() << msg.linear.x, msg.linear.y, 0.0).finished();
-  Highcmd.velocity_cmd = rotmat.transpose() * cmd_world;
+//   Eigen::Vector3d cmd_world = (Eigen::Vector3d() << msg.linear.x, msg.linear.y, 0.0).finished();
+//   Highcmd.velocity_cmd = rotmat.transpose() * cmd_world;
   Highcmd.omega_cmd[2] = msg.angular.z;
 
-  ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
+//   ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
+}
+
+void IOROS::poseCallback(const geometry_msgs::Pose& msg)
+{
+  Eigen::Vector3d pose_world = (Eigen::Vector3d() << _lowState.position.x, _lowState.position.y, 0).finished();
+  Eigen::Vector3d pose_body = rotmat.transpose() * (pose_world);
+
+  Highcmd.velocity_cmd[1] = 5*(msg.position.y -  pose_body[1]);
+  ROS_INFO("I heard: y=%f", Highcmd.velocity_cmd[1]);
 }
