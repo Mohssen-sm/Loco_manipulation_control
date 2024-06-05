@@ -279,7 +279,7 @@ void LocoManipulationMPC::updateMPCIfNeeded(int* mpcTable, ControlFSMData& data)
 
 
     // double Q[12] = {25, 20, 15, 1.0, 1.0, 32, 0.0, 0.0, 0.3, 0.2, 0.2, 0.2}; // weight for aliengo
-    double Q[12] = {8.0, 5.0, 10, 1.5, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2};
+    double Q[12] = {8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2};
 
     if(data._quadruped->robot_index == 2){
       *Q = (0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4);
