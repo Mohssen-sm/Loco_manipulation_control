@@ -40,7 +40,7 @@ void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
     {
         state->userValue.manipulation_force[i] = Highcmd.manipulation_force(i);
     }
-        state->userValue.vx = 0.0;
+        state->userValue.vx = Highcmd.velocity_cmd[0];
         state->userValue.vy = Highcmd.velocity_cmd[1];
         state->userValue.turn_rate = Highcmd.omega_cmd[2];
 }
@@ -328,11 +328,8 @@ void IOROS::ManiForceCallback(const geometry_msgs::Wrench& msg)
 
 void IOROS::cmdvelCallback(const geometry_msgs::Twist& msg)
 {
-//   Eigen::Vector3d cmd_world = (Eigen::Vector3d() << msg.linear.x, msg.linear.y, 0.0).finished();
-//   Highcmd.velocity_cmd = rotmat.transpose() * cmd_world;
+  cmd_body << msg.linear.x, msg.linear.y, 0.0;
   Highcmd.omega_cmd[2] = msg.angular.z;
-
-//   ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
 }
 
 void IOROS::poseCallback(const geometry_msgs::Pose& msg)
@@ -340,6 +337,8 @@ void IOROS::poseCallback(const geometry_msgs::Pose& msg)
   Eigen::Vector3d pose_world = (Eigen::Vector3d() << _lowState.position.x, _lowState.position.y, 0).finished();
   Eigen::Vector3d pose_body = rotmat.transpose() * (pose_world);
 
-  Highcmd.velocity_cmd[1] = 5*(msg.position.y -  pose_body[1]);
-  ROS_INFO("I heard: y=%f", Highcmd.velocity_cmd[1]);
+  Highcmd.velocity_cmd[0] = 5*(msg.position.x - 0.31 - pose_body[0]); // 0.32 is the head to COM distance
+  Highcmd.velocity_cmd[1] = cmd_body[1] + 3*(msg.position.y -  pose_body[1]);
+  //   ROS_INFO("I heard: y=%f", Highcmd.velocity_cmd[0]);
+  ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
 }

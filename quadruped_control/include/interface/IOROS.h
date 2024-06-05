@@ -38,6 +38,7 @@ class IOROS : public IOInterface
         geometry_msgs::TransformStamped _trunkTF;
         tf::TransformBroadcaster _trunkTF_broadcaster;
         Eigen::Matrix3d rotmat;
+        Eigen::Vector3d cmd_body;
 
         geometry_msgs::PoseWithCovarianceStamped _poseMsg;
 
