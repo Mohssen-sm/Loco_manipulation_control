@@ -35,7 +35,8 @@ void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
     state->userCmd = cmdPanel->getUserCmd();
     state->userValue = cmdPanel->getUserValue();
     
-    
+    if(planner_running)
+    {
     for (int i = 0; i < 2; i++)
     {
         state->userValue.manipulation_force[i] = Highcmd.manipulation_force(i);
@@ -43,6 +44,19 @@ void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
         state->userValue.vx = Highcmd.velocity_cmd[0];
         state->userValue.vy = Highcmd.velocity_cmd[1];
         state->userValue.turn_rate = Highcmd.omega_cmd[2];
+    }
+    else
+    {
+        for (int i = 0; i < 2; i++)
+    {
+        state->userValue.manipulation_force[i] = 0;
+    }
+        state->userValue.vx = 0;
+        state->userValue.vy = 0;
+        state->userValue.turn_rate = 0;
+
+        ROS_INFO_THROTTLE(1, "Waiting for new Target");
+    }
 }
 
 void IOROS::sendCmd(const LowlevelCmd *lowCmd){
@@ -161,6 +175,9 @@ void IOROS::initRecv(){
     _manipulation_force_sub = _nm.subscribe("wrench", 1, &IOROS::ManiForceCallback, this);
     _object_sub[0] = _nm.subscribe("cmd_vel", 1, &IOROS::cmdvelCallback, this);
     _object_sub[1] = _nm.subscribe("contactPoint", 1, &IOROS::poseCallback, this);
+    
+    // create a ROS timer 
+    timer = _nm.createTimer(ros::Duration(0.5), &IOROS::timerCallback, this);
 }
 
 void IOROS::StateCallback(const gazebo_msgs::ModelStates & msg)
@@ -323,6 +340,7 @@ void IOROS::ManiForceCallback(const geometry_msgs::Wrench& msg)
 {
     Eigen::Vector3d force_body = (Eigen::Vector3d() << msg.force.x, msg.force.y, msg.force.z).finished();
     Highcmd.manipulation_force = rotmat * force_body;
+    msg_received = true;
     // ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.manipulation_force[0], Highcmd.manipulation_force[1], Highcmd.manipulation_force[2]);
 }
 
@@ -330,6 +348,7 @@ void IOROS::cmdvelCallback(const geometry_msgs::Twist& msg)
 {
   cmd_body << msg.linear.x, msg.linear.y, 0.0;
   Highcmd.omega_cmd[2] = msg.angular.z;
+  msg_received = true;
 }
 
 void IOROS::poseCallback(const geometry_msgs::Pose& msg)
@@ -337,8 +356,18 @@ void IOROS::poseCallback(const geometry_msgs::Pose& msg)
   Eigen::Vector3d pose_world = (Eigen::Vector3d() << _lowState.position.x, _lowState.position.y, 0).finished();
   Eigen::Vector3d pose_body = rotmat.transpose() * (pose_world);
 
-  Highcmd.velocity_cmd[0] = 2*(msg.position.x - 0.25 - pose_body[0]); // 0.32 is the head to COM distance
-  Highcmd.velocity_cmd[1] = cmd_body[1] + 3*(msg.position.y -  pose_body[1]);
+  Highcmd.velocity_cmd[0] = 2*(msg.position.x - 0.25 - pose_body[0]); // 0.32 is the head to COM distance - magic number
+  Highcmd.velocity_cmd[1] = cmd_body[1] + 3*(msg.position.y -  pose_body[1]); // magic number
     // ROS_INFO("I heard: vel=%f , box_pos=%f , pose_body=%f", Highcmd.velocity_cmd[0], msg.position.x, pose_body[0]);
 //   ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
+  msg_received = true;
+}
+
+void IOROS::timerCallback(const ros::TimerEvent&) {
+  if (msg_received) {
+    msg_received = false;
+    planner_running = true;
+  } else {
+    planner_running = false;
+  }
 }

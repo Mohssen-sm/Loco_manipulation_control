@@ -73,6 +73,10 @@ class IOROS : public IOInterface
         void ManiForceCallback(const geometry_msgs::Wrench& msg);
         void cmdvelCallback(const geometry_msgs::Twist& msg);
         void poseCallback(const geometry_msgs::Pose& msg);
+        void timerCallback(const ros::TimerEvent&); 
+        bool msg_received =false;
+        bool planner_running = false;
+        ros::Timer timer;
 
         boost::array<double, 36> _odom_pose_covariance = {1e-9, 0, 0, 0, 0, 0, 
                                         0, 1e-3, 1e-9, 0, 0, 0, 
