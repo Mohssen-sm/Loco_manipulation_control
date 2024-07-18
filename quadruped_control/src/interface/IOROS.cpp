@@ -340,5 +340,5 @@ void IOROS::poseCallback(const geometry_msgs::Pose& msg)
   Highcmd.velocity_cmd[0] = 2*(msg.position.x - 0.25 - pose_body[0]); // 0.32 is the head to COM distance
   Highcmd.velocity_cmd[1] = cmd_body[1] + 3*(msg.position.y -  pose_body[1]);
     // ROS_INFO("I heard: vel=%f , box_pos=%f , pose_body=%f", Highcmd.velocity_cmd[0], msg.position.x, pose_body[0]);
-  ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
+//   ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
 }
