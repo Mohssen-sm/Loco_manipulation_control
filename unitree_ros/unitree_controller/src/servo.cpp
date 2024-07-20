@@ -29,11 +29,11 @@ class multiThread
 public:
     multiThread(string rname){
         robot_name = rname;
-        imu_sub = nm.subscribe("a1/trunk_imu", 1, &multiThread::imuCallback, this);
-        footForce_sub[0] = nm.subscribe("/visual/a1/FR_foot_contact/the_force", 1, &multiThread::FRfootCallback, this);
-        footForce_sub[1] = nm.subscribe("/visual/a1/FL_foot_contact/the_force", 1, &multiThread::FLfootCallback, this);
-        footForce_sub[2] = nm.subscribe("/visual/a1/RR_foot_contact/the_force", 1, &multiThread::RRfootCallback, this);
-        footForce_sub[3] = nm.subscribe("/visual/a1/RL_foot_contact/the_force", 1, &multiThread::RLfootCallback, this);
+        imu_sub = nm.subscribe("/trunk_imu", 1, &multiThread::imuCallback, this);
+        footForce_sub[0] = nm.subscribe("/visual/FR_foot_contact/the_force", 1, &multiThread::FRfootCallback, this);
+        footForce_sub[1] = nm.subscribe("/visual/FL_foot_contact/the_force", 1, &multiThread::FLfootCallback, this);
+        footForce_sub[2] = nm.subscribe("/visual/RR_foot_contact/the_force", 1, &multiThread::RRfootCallback, this);
+        footForce_sub[3] = nm.subscribe("/visual/RL_foot_contact/the_force", 1, &multiThread::RLfootCallback, this);
         servo_sub[0] = nm.subscribe("/" + robot_name + "_gazebo/FR_hip_controller/state", 1, &multiThread::FRhipCallback, this);
         servo_sub[1] = nm.subscribe("/" + robot_name + "_gazebo/FR_thigh_controller/state", 1, &multiThread::FRthighCallback, this);
         servo_sub[2] = nm.subscribe("/" + robot_name + "_gazebo/FR_calf_controller/state", 1, &multiThread::FRcalfCallback, this);
