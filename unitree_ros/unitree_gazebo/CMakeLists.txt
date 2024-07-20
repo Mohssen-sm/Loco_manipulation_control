@@ -48,5 +48,10 @@ target_link_libraries(unitreeFootContactPlugin ${catkin_LIBRARIES} ${GAZEBO_LIBR
 add_library(unitreeDrawForcePlugin SHARED plugin/draw_force_plugin.cc)
 target_link_libraries(unitreeDrawForcePlugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 
+# add_executable(unitree_external_force src/exe/external_force.cpp)
+# target_link_libraries(unitree_external_force ${catkin_LIBRARIES})
+
+# add_executable(unitree_servo src/exe/servo.cpp)
+# target_link_libraries(unitree_servo ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 

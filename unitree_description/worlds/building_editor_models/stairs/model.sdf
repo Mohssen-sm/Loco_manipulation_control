@@ -4,10 +4,10 @@
     <pose frame=''>3.7 0.009 0 0 -0 0</pose>
     <link name='Stairs_1'>
       <visual name='Stairs_1_Visual_0'>
-        <pose frame=''>-0.375 -0 0.09 0 -0 1.5708</pose>
+        <pose frame=''>-0.375 -0 0.075 0 -0 1.5708</pose>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
         <material>
@@ -24,16 +24,16 @@
       <collision name='Stairs_1_Collision_0'>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
-        <pose frame=''>-0.375 -0 0.09 0 -0 1.5708</pose>
+        <pose frame=''>-0.375 -0 0.075 0 -0 1.5708</pose>
       </collision>
       <visual name='Stairs_1_Visual_1'>
-        <pose frame=''>-0.125 -0 0.27 0 -0 1.5708</pose>
+        <pose frame=''>-0.125 -0 0.225 0 -0 1.5708</pose>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
         <material>
@@ -50,16 +50,16 @@
       <collision name='Stairs_1_Collision_1'>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
-        <pose frame=''>-0.125 -0 0.27 0 -0 1.5708</pose>
+        <pose frame=''>-0.125 -0 0.225 0 -0 1.5708</pose>
       </collision>
       <visual name='Stairs_1_Visual_2'>
-        <pose frame=''>0.125 0 0.45 0 -0 1.5708</pose>
+        <pose frame=''>0.125 0 0.375 0 -0 1.5708</pose>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
         <material>
@@ -76,16 +76,16 @@
       <collision name='Stairs_1_Collision_2'>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
-        <pose frame=''>0.125 0 0.45 0 -0 1.5708</pose>
+        <pose frame=''>0.125 0 0.375 0 -0 1.5708</pose>
       </collision>
       <visual name='Stairs_1_Visual_3'>
-        <pose frame=''>0.375 0 0.63 0 -0 1.5708</pose>
+        <pose frame=''>0.375 0 0.525 0 -0 1.5708</pose>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
         <material>
@@ -102,10 +102,10 @@
       <collision name='Stairs_1_Collision_3'>
         <geometry>
           <box>
-            <size>2 0.25 0.18</size>
+            <size>2 0.25 0.15</size>
           </box>
         </geometry>
-        <pose frame=''>0.375 0 0.63 0 -0 1.5708</pose>
+        <pose frame=''>0.375 0 0.525 0 -0 1.5708</pose>
       </collision>
     </link>
     <static>1</static>
