@@ -13,7 +13,7 @@
 
     <xacro:property name="mesh_path" value="package://unitree_description/xacro/$(arg robot_type)/meshes"/>
 
-    <link name="$(arg ns)_base">
+    <link name="base">
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
@@ -22,13 +22,13 @@
         </visual>
     </link>
 
-    <joint name="$(arg ns)_floating_base" type="fixed">
+    <joint name="floating_base" type="fixed">
         <origin rpy="0 0 0" xyz="0 0 0"/>
-        <parent link="$(arg ns)_base"/>
-        <child link="$(arg ns)_trunk"/>
+        <parent link="base"/>
+        <child link="trunk"/>
     </joint>
 
-    <link name="$(arg ns)_trunk">
+    <link name="trunk">
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
@@ -52,21 +52,21 @@
         </inertial>
     </link>
 
-    <xacro:IMU connected_to="$(arg ns)_trunk" imu_name="$(arg ns)_imu" xyz="0. 0. 0." rpy="0. 0. 0."/>
+    <xacro:IMU connected_to="trunk" imu_name="imu" xyz="0. 0. 0." rpy="0. 0. 0."/>
 
-    <xacro:leg prefix="$(arg ns)_FR" mesh_path="${mesh_path}" mirror="-1" mirror_dae= "False" front_hind="1" front_hind_dae="True" ns="$(arg ns)">
+    <xacro:leg prefix="FR" mesh_path="${mesh_path}" mirror="-1" mirror_dae= "False" front_hind="1" front_hind_dae="True">
         <origin rpy="0 0 0" xyz="${leg_offset_x} ${-leg_offset_y} 0"/>
     </xacro:leg>
 
-    <xacro:leg prefix="$(arg ns)_FL" mesh_path="${mesh_path}"  mirror="1" mirror_dae="True" front_hind="1" front_hind_dae="True" ns="$(arg ns)">
+    <xacro:leg prefix="FL" mesh_path="${mesh_path}"  mirror="1" mirror_dae="True" front_hind="1" front_hind_dae="True">
         <origin rpy="0 0 0" xyz="${leg_offset_x} ${leg_offset_y} 0"/>
     </xacro:leg>
 
-    <xacro:leg prefix="$(arg ns)_RR" mesh_path="${mesh_path}" mirror="-1" mirror_dae="False" front_hind="-1" front_hind_dae="False" ns="$(arg ns)">
+    <xacro:leg prefix="RR" mesh_path="${mesh_path}" mirror="-1" mirror_dae="False" front_hind="-1" front_hind_dae="False">
         <origin rpy="0 0 0" xyz="${-leg_offset_x} ${-leg_offset_y} 0"/>
     </xacro:leg>
 
-    <xacro:leg prefix="$(arg ns)_RL" mesh_path="${mesh_path}" mirror="1" mirror_dae="True" front_hind="-1" front_hind_dae="False" ns="$(arg ns)">
+    <xacro:leg prefix="RL" mesh_path="${mesh_path}" mirror="1" mirror_dae="True" front_hind="-1" front_hind_dae="False">
         <origin rpy="0 0 0" xyz="${-leg_offset_x} ${leg_offset_y} 0"/>
     </xacro:leg>
 
@@ -78,17 +78,17 @@
     </gazebo>
 
     <!-- Foot contacts. -->
-    <xacro:CONTACT link_name="$(arg ns)_FR_calf" prefix="FR" ns="$(arg ns)"/>
-    <xacro:CONTACT link_name="$(arg ns)_FL_calf" prefix="FL" ns="$(arg ns)"/>
-    <xacro:CONTACT link_name="$(arg ns)_RR_calf" prefix="RR" ns="$(arg ns)"/>
-    <xacro:CONTACT link_name="$(arg ns)_RL_calf" prefix="RL" ns="$(arg ns)"/>
+    <xacro:CONTACT link_name="FR_calf" prefix="FR"/>
+    <xacro:CONTACT link_name="FL_calf" prefix="FL"/>
+    <xacro:CONTACT link_name="RR_calf" prefix="RR"/>
+    <xacro:CONTACT link_name="RL_calf" prefix="RL"/>
     
-    <gazebo reference="$(arg ns)_base">
+    <gazebo reference="base">
         <material>Gazebo/Green</material>
         <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
-    <gazebo reference="$(arg ns)_trunk">
+    <gazebo reference="trunk">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <kp  value="1000000.0"/>

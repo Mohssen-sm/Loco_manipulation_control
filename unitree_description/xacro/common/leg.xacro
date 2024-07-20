@@ -4,11 +4,11 @@
 
     <xacro:include filename="$(find unitree_description)/xacro/common/transmission.xacro"/>
 
-    <xacro:macro name="leg" params="prefix mesh_path mirror mirror_dae front_hind front_hind_dae ns *origin">
+    <xacro:macro name="leg" params="prefix mesh_path mirror mirror_dae front_hind front_hind_dae *origin">
 
         <joint name="${prefix}_hip_joint" type="revolute">
             <xacro:insert_block name="origin"/>
-            <parent link="${ns}_trunk"/>
+            <parent link="trunk"/>
             <child link="${prefix}_hip"/>
             <axis xyz="1 0 0"/>
             <dynamics damping="${damping}" friction="${friction}"/>

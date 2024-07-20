@@ -35,6 +35,7 @@ class IOROS : public IOInterface
         HighlevelCmd Highcmd;
         
         ros::Time _currentTime;
+        std::string tf_prefix;
         geometry_msgs::TransformStamped _trunkTF;
         tf::TransformBroadcaster _trunkTF_broadcaster;
         Eigen::Matrix3d rotmat;

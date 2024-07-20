@@ -23,6 +23,7 @@ IOROS::IOROS(std::string robot_name) : IOInterface()
     signal(SIGINT, RosShutDown);
 
     cmdPanel = new KeyBoard();
+    _nm.param<std::string>("tf_prefix", tf_prefix, "");
 }
 
 IOROS::~IOROS()
@@ -113,8 +114,8 @@ void IOROS::recvState(LowlevelState *state)
     _currentTime = ros::Time::now();
 
     _trunkTF.header.stamp = _currentTime;
-    _trunkTF.header.frame_id = "world";
-    _trunkTF.child_frame_id = _nm.getNamespace().substr(1) + "_base";
+    _trunkTF.header.frame_id = "world"; 
+    _trunkTF.child_frame_id = tf_prefix + "/" + "base";
 
     _trunkTF.transform.translation.x = _lowState.position.x;
     _trunkTF.transform.translation.y = _lowState.position.y;
