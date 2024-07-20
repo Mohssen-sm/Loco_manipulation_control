@@ -6,7 +6,6 @@
     <xacro:include filename="$(find z1_description)/xacro/gazebo.xacro"/>
     <xacro:include filename="$(find z1_description)/xacro/transmission.xacro"/>
 
-    <!-- <xacro:property name="UnitreeGripper" value="false"/> -->
     <xacro:arg name="UnitreeGripper" default="false"/>
 
     <link name="world"/>
@@ -21,7 +20,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link00.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link00.dae" scale="1 1 1"/>
             </geometry>
         </visual>
         <collision>
@@ -53,15 +52,9 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link01.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link01.dae" scale="1 1 1"/>
             </geometry>
         </visual>
-        <!-- <collision>
-            <geometry>
-                <cylinder length="${2*motor_height}" radius="${motor_diameter}"/>
-            </geometry>
-            <origin rpy="0 0 0" xyz="0 0 0"/>
-        </collision> -->
         <inertial>
             <origin rpy="0 0 0" xyz="${L01_ComX} ${L01_ComY} ${L01_ComZ}"/>
             <mass value="${L01_Mass}"/>
@@ -85,7 +78,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link02.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link02.dae" scale="1 1 1"/>
             </geometry>
         </visual>
         <collision>
@@ -129,7 +122,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link03.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link03.dae" scale="1 1 1"/>
             </geometry>
         </visual>
         <collision>
@@ -142,7 +135,7 @@
             <geometry>
                 <cylinder length="0.059" radius="${motor_diameter}"/>
             </geometry>
-            <origin rpy="0 ${PI/2.0} 0" xyz="${0.065+0.185-0.059/2.0} 0 0.055"/>
+            <origin rpy="0 ${PI/2.0} ${PI/2.0}" xyz="${0.065+0.185-0.059/2.0} 0 0.055"/>
         </collision>
         <inertial>
             <origin rpy="0 0 0" xyz="${L03_ComX} ${L03_ComY} ${L03_ComZ}"/>
@@ -167,14 +160,14 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link04.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link04.dae" scale="1 1 1"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <cylinder length="0.073" radius="${motor_diameter}"/>
+                <cylinder length="${motor_height + 2*0.008}" radius="${motor_diameter}"/>
             </geometry>
-            <origin rpy="${PI/2.0} 0 0" xyz="0.0472 0 0"/>
+            <origin rpy="0 0 0" xyz="0.072 0 0"/>
         </collision>
         <inertial>
             <origin rpy="0 0 0" xyz="${L04_ComX} ${L04_ComY} ${L04_ComZ}"/>
@@ -199,7 +192,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link05.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link05.dae" scale="1 1 1"/>
             </geometry>
         </visual>
         <inertial>
@@ -225,7 +218,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://z1_description/meshes/z1_Link06.dae" scale="1 1 1"/>
+                <mesh filename="package://z1_description/meshes/visual/z1_Link06.dae" scale="1 1 1"/>
             </geometry>
         </visual>
         <collision>
@@ -253,18 +246,15 @@
 
         <link name="gripperStator">
             <visual>
-                <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="package://z1_description/meshes/z1_GripperStator.dae" scale="1 1 1"/>
+                    <mesh filename="package://z1_description/meshes/visual/z1_GripperStator.dae" scale="1 1 1"/>
                 </geometry>
             </visual>
             <collision>
                 <geometry>
-                    <cylinder length="${motor_height}" radius="${motor_diameter}"/>
+                    <mesh filename="package://z1_description/meshes/collision/z1_GripperStator.STL" scale="1 1 1"/>
                 </geometry>
-                <origin rpy="0 0 0" xyz="0 0 0"/>
             </collision>
-
             <inertial>
                 <origin rpy="0 0 0" xyz="${GripperStator_ComX} ${GripperStator_ComY} ${GripperStator_ComZ}"/>
                 <mass value="${GripperStator_Mass}"/>
@@ -286,11 +276,15 @@
 
         <link name="gripperMover">
             <visual>
-                <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="package://z1_description/meshes/z1_GripperMover.dae" scale="1 1 1"/>
+                    <mesh filename="package://z1_description/meshes/visual/z1_GripperMover.dae" scale="1 1 1"/>
                 </geometry>
             </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://z1_description/meshes/collision/z1_GripperMover.STL" scale="1 1 1"/>
+                </geometry>
+            </collision>
             <inertial>
                 <origin rpy="0 0 0" xyz="${GripperMover_ComX} ${GripperMover_ComY} ${GripperMover_ComZ}"/>
                 <mass value="${GripperMover_Mass}"/>
