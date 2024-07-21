@@ -2,7 +2,7 @@
 
 ```
 cd src
-git clone --recurse-submodules https://github.com/Mohssen-sm/Loco_manipulation_control
+git clone --recurse-submodules git@github.com:Mohssen-sm/Loco_manipulation_control.git
 ```
 
 ### Build
