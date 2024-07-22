@@ -48,7 +48,7 @@ file(GLOB_RECURSE SRC_LIST
 "BalanceController/*.cpp"
 "ConvexMPC/*.cpp"
 )
-add_executable(quad_control src/main.cpp  ${SRC_LIST} )
+add_executable(quad_control src/quad_control.cpp  ${SRC_LIST} )
 target_link_libraries(quad_control ${catkin_LIBRARIES} qpOASES -pthread lcm)
 
 
