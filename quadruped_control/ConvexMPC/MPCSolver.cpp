@@ -1,7 +1,7 @@
 #include "MPCSolver.h"
 #include "utils.h"
 
-MPCSolver::MPCSolver(double dt, int horizon, double mu, double f_max)
+MPCSolver::MPCSolver(double dt, int horizon, double mu, double f_max, Quadruped *quad) : rs(quad)
 {
   state_num = 13;
   control_num = 12;
@@ -29,16 +29,6 @@ void MPCSolver::initialize_mpc()
 
   if (pthread_mutex_init(&update_mt, NULL) != 0)
     printf("[MPC ERROR] Failed to initialize update data mutex.\n");
-
-#ifdef K_DEBUG
-  printf("[MPC] Debugging enabled.\n");
-  printf("[MPC] Size of problem setup struct: %ld bytes.\n", sizeof(problem_setup));
-  printf("      Size of problem update struct: %ld bytes.\n", sizeof(update_data_t));
-  printf("      Size of MATLAB floating point type: %ld bytes.\n", sizeof(mfp));
-  printf("      Size of flt: %ld bytes.\n", sizeof(flt));
-#else
-    // printf("[MPC] Debugging disabled.\n");
-#endif
 }
 
 void MPCSolver::setup_problem(double dt, int horizon, double mu, double f_max)
@@ -49,21 +39,11 @@ void MPCSolver::setup_problem(double dt, int horizon, double mu, double f_max)
     first_run = false;
     initialize_mpc();
   }
-
-#ifdef K_DEBUG
-  printf("[MPC] Got new problem configuration!\n");
-  printf("[MPC] Prediction horizon length: %d\n      Force limit: %.3f, friction %.3f\n      dt: %.3f\n",
-         horizon, f_max, mu, dt);
-#endif
-
-  // pthread_mutex_lock(&problem_cfg_mt);
-
   setup.horizon = horizon;
   setup.f_max = f_max;
   setup.mu = mu;
   setup.dt = dt;
 
-  // pthread_mutex_unlock(&problem_cfg_mt);
   resize_qp_mats(horizon);
 }
 
@@ -233,7 +213,6 @@ void MPCSolver::resize_qp_mats(s16 horizon)
 
 void MPCSolver::c2qp(Eigen::Matrix<fpt, 3, 3> I_world, fpt m, Eigen::Matrix<fpt, 3, 4> r_feet, Eigen::Matrix<fpt, 3, 3> R_yaw, fpt dt, s16 horizon)
 {
-
   A.setZero();
   A(3, 9) = 1.f;
   A(4, 10) = 1.f;
@@ -299,7 +278,7 @@ void MPCSolver::c2qp(Eigen::Matrix<fpt, 3, 3> I_world, fpt m, Eigen::Matrix<fpt,
 
 void MPCSolver::solve_mpc()
 {
-  rs.set(update.p, update.v, update.q, update.w, update.r, update.yaw, update.robot_type);
+  rs.set(update.p, update.v, update.q, update.w, update.r, update.yaw);
 
   // roll pitch yaw
   Eigen::Matrix<fpt, 3, 1> rpy;
@@ -317,11 +296,11 @@ void MPCSolver::solve_mpc()
   else if (state_num == 15)
   { // loco-manipulation control
     x_0 << rpy(2), rpy(1), rpy(0), rs.p, rs.w, rs.v, 1.f,
-        -manipulation_force[0] / rs.m, -manipulation_force[1] / rs.m;
+        -manipulation_force[0] / rs.mass, -manipulation_force[1] / rs.mass;
   }
 
   // QP matrices
-  c2qp(rs.I_world, rs.m, rs.r_feet, rs.R_yaw, setup.dt, setup.horizon);
+  c2qp(rs.I_world, rs.mass, rs.r_feet, rs.R_yaw, setup.dt, setup.horizon);
 
   // weights
 
@@ -485,8 +464,6 @@ void MPCSolver::solve_mpc()
     if (rval2 != qpOASES::SUCCESSFUL_RETURN)
       printf("failed to solve!\n");
 
-    // printf("solve time: %.3f ms, size %d, %d\n", solve_timer.getMs(), new_vars, new_cons);
-
     vc = 0;
     for (int i = 0; i < num_variables; i++)
     {
@@ -501,8 +478,4 @@ void MPCSolver::solve_mpc()
       }
     }
   }
-
-#ifdef K_PRINT_EVERYTHING
-  // cout<<"fmat:\n"<<fmat<<endl;
-#endif
 }

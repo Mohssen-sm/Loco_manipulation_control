@@ -2,7 +2,7 @@
 
 FSMState_Climb::FSMState_Climb(ControlFSMData *data)
                :FSMState(data, FSMStateName::CLIMB, "climb"),
-               Cmpc(0.001, 60, 10){}
+               Cmpc(0.001, 10, data->_quadruped){}
 
 template<typename T0, typename T1, typename T2>
 T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim = -1, const double maxLim = 1){

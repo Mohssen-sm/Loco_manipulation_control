@@ -1,7 +1,6 @@
 #include "MPCLocoMotion.h"
 
-MPCLocomotion::MPCLocomotion(double _dt, int _iterations_between_mpc, int horizon):
-  iterationsBetweenMPC(_iterations_between_mpc),
+MPCLocomotion::MPCLocomotion(double _dt, int horizon, Quadruped* quad) :
   horizonLength(horizon),
   dt(_dt),
   galloping(horizonLength, Vec4<int>(0,2,7,9),Vec4<int>(5,5,5,5),"Galloping"),
@@ -14,11 +13,11 @@ MPCLocomotion::MPCLocomotion(double _dt, int _iterations_between_mpc, int horizo
   two_foot_trot(horizonLength, Vec4<int>(0,0,5,0), Vec4<int>(10,10,5,5), "two_foot_trot"),
   static_walking(11, Vec4<int>(0,2,5,8), Vec4<int>(7,7,7,7), "static_walking")
 {
+  iterationsBetweenMPC = quad->gait_iteration;
   dtMPC = dt * iterationsBetweenMPC;
-  //std::cout << "dtMPC: " << dtMPC << std::endl;
+
   rpy_int[2] = 0;
   for(int i = 0; i < 4; i++)
     firstSwing[i] = true;
 
-  // foot_position.open("foot_pos.txt");
 }

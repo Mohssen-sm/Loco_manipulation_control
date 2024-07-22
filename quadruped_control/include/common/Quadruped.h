@@ -4,25 +4,33 @@
 #include <vector>
 #include "cppTypes.h"
 #include <string>
-class Quadruped{
-  public:
-    Quadruped(std::string robot_name){
-        if(robot_name == "aliengo"){
+class Quadruped
+{
+public:
+    Quadruped(std::string robot_name)
+    {
+        if (robot_name == "aliengo")
+        {
             robot_index = 1;
         }
-        else if(robot_name == "a1"){
+        else if (robot_name == "a1")
+        {
             robot_index = 2;
         }
-        else if(robot_name == "go1"){
+        else if (robot_name == "go1")
+        {
             robot_index = 3;
         }
-        else{
+        else
+        {
             throw std::runtime_error("Invalid robot type specified. Aborting.");
         }
         setQuadruped();
     }
-    void setQuadruped(){
-        if(robot_index == 1){ // Aliengo
+    void setQuadruped()
+    {
+        if (robot_index == 1)
+        { // Aliengo
             mass = 19;
             Ig << 0.050874, 0.64036, 0.65655;
 
@@ -33,8 +41,10 @@ class Quadruped{
             hipLinkLength = 0.0838;
             thighLinkLength = 0.25;
             calfLinkLength = 0.25;
+            gait_iteration = 50;
         }
-        if(robot_index == 2){ // A1
+        else if (robot_index == 2)
+        { // A1
             mass = 12;
             Ig << 0.0168, 0.0565, 0.064;
 
@@ -45,10 +55,12 @@ class Quadruped{
             hipLinkLength = 0.0838; // hip offset in const.xacro
             thighLinkLength = 0.2;
             calfLinkLength = 0.2;
+            gait_iteration = 30;
         }
-        if(robot_index == 3){ // Go1
+        else if (robot_index == 3)
+        { // Go1
             mass = 12.84;
-            Ig << 0.0792, 0.2085, 0.2265; 
+            Ig << 0.0792, 0.2085, 0.2265;
 
             leg_offset_x = 0.1881;
             leg_offset_y = 0.04675;
@@ -57,6 +69,7 @@ class Quadruped{
             hipLinkLength = 0.08; // hip offset in const.xacro
             thighLinkLength = 0.213;
             calfLinkLength = 0.213;
+            gait_iteration = 30;
         }
     }
     int robot_index; // 1 for Aliengo, 2 for A1
@@ -68,26 +81,32 @@ class Quadruped{
     double leg_offset_z;
     double mass;
     Vec3<double> Ig;
+    int gait_iteration;
 
-    Vec3<double> getHipLocation(int leg){
-        assert(leg >=0 && leg <4);
+    Vec3<double> getHipLocation(int leg)
+    {
+        assert(leg >= 0 && leg < 4);
         Vec3<double> pHip = Vec3<double>::Zero();
-        if (leg == 0){
+        if (leg == 0)
+        {
             pHip(0) = leg_offset_x;
             pHip(1) = -leg_offset_y;
             pHip(2) = leg_offset_z;
         }
-        if (leg == 1){
+        if (leg == 1)
+        {
             pHip(0) = leg_offset_x;
             pHip(1) = leg_offset_y;
             pHip(2) = leg_offset_z;
         }
-        if (leg == 2){
+        if (leg == 2)
+        {
             pHip(0) = -leg_offset_x;
             pHip(1) = -leg_offset_y;
             pHip(2) = leg_offset_z;
         }
-        if (leg == 3){
+        if (leg == 3)
+        {
             pHip(0) = -leg_offset_x;
             pHip(1) = leg_offset_y;
             pHip(2) = leg_offset_z;
@@ -95,7 +114,6 @@ class Quadruped{
 
         return pHip;
     };
-
 };
 
 #endif

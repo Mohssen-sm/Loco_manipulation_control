@@ -20,7 +20,7 @@ using Eigen::Array4d;
 
 class MPCLocomotion{
 public:
-  MPCLocomotion(double _dt, int _iterations_between_mpc, int horizon);
+  MPCLocomotion(double _dt, int horizon, Quadruped* quad);
   void setGaitNum(int gaitNum){gaitNumber = gaitNum; return;}
   virtual void run(ControlFSMData& data) = 0;
 

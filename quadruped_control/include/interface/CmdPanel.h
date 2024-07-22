@@ -7,21 +7,22 @@
 #include "../messages/LowlevelState.h"
 #include <pthread.h>
 
-
-class CmdPanel{
+class CmdPanel
+{
 public:
-    CmdPanel(){}
-    ~CmdPanel(){}
-    UserCommand getUserCmd(){return userCmd;}
-    UserValue getUserValue(){return userValue;}
-    void setPassive(){userCmd = UserCommand::L2_B;}
-    void setZero(){userValue.setZero();}
-    void setCmdNone(){userCmd = UserCommand::NONE;}
-    virtual void receiveHandle(UNITREE_LEGGED_SDK::LowState *lowState){};
+    CmdPanel() {}
+    ~CmdPanel() {}
+    UserCommand getUserCmd() { return userCmd; }
+    UserValue getUserValue() { return userValue; }
+    void setPassive() { userCmd = UserCommand::L2_B; }
+    void setZero() { userValue.setZero(); }
+    void setCmdNone() { userCmd = UserCommand::NONE; }
+    virtual void receiveHandle(UNITREE_LEGGED_SDK::LowState *lowState) {};
+
 protected:
-    virtual void *run(void *arg){};
+    virtual void *run(void *arg) = 0;
     UserCommand userCmd;
     UserValue userValue;
 };
 
-#endif  // CMDPANEL_H
+#endif // CMDPANEL_H

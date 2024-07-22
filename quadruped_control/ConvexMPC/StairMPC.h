@@ -4,16 +4,16 @@
 #include "MPCLocoMotion.h"
 #include "MPCSolver.h"
 
-class StairMPC : public MPCLocomotion {
+class StairMPC : public MPCLocomotion
+{
 public:
-  StairMPC(double _dt, int _iterations_between_mpc, int horizon);
+  StairMPC(double _dt, int horizon, Quadruped *quad);
 
-  void run(ControlFSMData& data);
+  void run(ControlFSMData &data);
 
-  void updateMPCIfNeeded(int* mpcTable, ControlFSMData& data);
+  void updateMPCIfNeeded(int *mpcTable, ControlFSMData &data);
 
   MPCSolver solver;
-
 };
 
-#endif 
+#endif

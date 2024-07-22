@@ -53,7 +53,7 @@ struct update_data_t
 class MPCSolver
 {
 public:
-  MPCSolver(double dt, int horizon, double mu, double f_max);
+  MPCSolver(double dt, int horizon, double mu, double f_max, Quadruped *quad);
   void setup_problem(double dt, int horizon, double mu, double f_max);
   void setup_adaptive(int horizon, int _state_num, float *_mu_2);
   void setup_LocoManipulation(int horizon, int _state_num);
