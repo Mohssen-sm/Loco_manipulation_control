@@ -18,7 +18,7 @@
 class IOROS : public IOInterface
 {
     public:
-        IOROS(std::string robot_name);
+        IOROS();
         ~IOROS();
         void sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
 

@@ -51,10 +51,4 @@ file(GLOB_RECURSE SRC_LIST
 add_executable(quad_control src/main.cpp  ${SRC_LIST} )
 target_link_libraries(quad_control ${catkin_LIBRARIES} qpOASES -pthread lcm)
 
-add_executable(aliengo_ctrl src/aliengo_ctrl.cpp  ${SRC_LIST} )
-target_link_libraries(aliengo_ctrl ${catkin_LIBRARIES} qpOASES -pthread lcm)
-
-add_executable(a1_ctrl src/a1_ctrl.cpp  ${SRC_LIST} )
-target_link_libraries(a1_ctrl ${catkin_LIBRARIES} qpOASES -pthread lcm)
-
 
