@@ -24,6 +24,7 @@ class Quadruped{
     void setQuadruped(){
         if(robot_index == 1){ // Aliengo
             mass = 19;
+            Ig << 0.050874, 0.64036, 0.65655;
 
             leg_offset_x = 0.2399;
             leg_offset_y = 0.051;
@@ -35,6 +36,7 @@ class Quadruped{
         }
         if(robot_index == 2){ // A1
             mass = 12;
+            Ig << 0.0168, 0.0565, 0.064;
 
             leg_offset_x = 0.1805;
             leg_offset_y = 0.047;
@@ -46,6 +48,7 @@ class Quadruped{
         }
         if(robot_index == 3){ // Go1
             mass = 12.84;
+            Ig << 0.0792, 0.2085, 0.2265; 
 
             leg_offset_x = 0.1881;
             leg_offset_y = 0.04675;
@@ -64,6 +67,7 @@ class Quadruped{
     double leg_offset_y;
     double leg_offset_z;
     double mass;
+    Vec3<double> Ig;
 
     Vec3<double> getHipLocation(int leg){
         assert(leg >=0 && leg <4);
