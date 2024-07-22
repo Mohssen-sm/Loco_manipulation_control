@@ -45,7 +45,7 @@ class Quadruped{
             calfLinkLength = 0.2;
         }
         if(robot_index == 3){ // Go1
-            mass = 12;
+            mass = 12.84;
 
             leg_offset_x = 0.1881;
             leg_offset_y = 0.04675;

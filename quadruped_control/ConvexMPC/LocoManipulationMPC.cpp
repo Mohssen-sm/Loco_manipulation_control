@@ -288,8 +288,6 @@ void LocoManipulationMPC::updateMPCIfNeeded(int* mpcTable, ControlFSMData& data)
     double* weights = Q;
     double alpha = 4e-5; // make setting eventually
 
-    //printf("current posistion: %3.f %.3f %.3f\n", p[0], p[1], p[2]);
-
     if(alpha > 1e-4)
     {
 
@@ -297,7 +295,6 @@ void LocoManipulationMPC::updateMPCIfNeeded(int* mpcTable, ControlFSMData& data)
       alpha = 1e-5;
     }
     Vec3<double> v_des_robot(stateCommand->data.stateDes[6], stateCommand->data.stateDes[7],0);
-    //Vec3<double> v_des_world = coordinateRotation(CoordinateAxis::Z, seResult.rpy[2]).transpose() * v_des_robot;
 
     Vec3<double> v_des_world = seResult.rBody.transpose() * v_des_robot;
 
@@ -313,9 +310,6 @@ void LocoManipulationMPC::updateMPCIfNeeded(int* mpcTable, ControlFSMData& data)
 
       world_position_desired[0] = xStart;
       world_position_desired[1] = yStart;
-
-      //printf("xys: \t%.3f\t%3.f\n", xStart, yStart);
-      //printf("perr \t%.3f\t%.3f\n", p[0] - world_position_desired[0], p[1] - world_position_desired[1]);
       
       double trajInitial[12] = {//stateCommand->data.stateDes[3],
 				rpy_comp[0] + stateCommand->data.stateDes[3],  // 0
@@ -347,7 +341,6 @@ void LocoManipulationMPC::updateMPCIfNeeded(int* mpcTable, ControlFSMData& data)
           trajAll[12*i + 3] = trajAll[12 * (i - 1) + 3] + dtMPC * v_des_world[0];
           trajAll[12*i + 4] = trajAll[12 * (i - 1) + 4] + dtMPC * v_des_world[1];
           trajAll[12*i + 2] = trajAll[12 * (i - 1) + 2] + dtMPC * stateCommand->data.stateDes[11];
-          //std::cout << "yaw traj" <<  trajAll[12*i + 2] << std::endl;
         }
       }
 
@@ -359,9 +352,6 @@ void LocoManipulationMPC::updateMPCIfNeeded(int* mpcTable, ControlFSMData& data)
     solver.set_manipulation_force(data._lowState->userValue.manipulation_force);
     solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable, data._quadruped->robot_index);
     
-    //t2.stopPrint("Run MPC");
-    // printf("MPC Solve time %f ms\n", t2.getMs());
-    //std::cout << t2.getSeconds() << std::endl;
     for(int leg = 0; leg < 4; leg++)
     {
       Vec3<double> f;

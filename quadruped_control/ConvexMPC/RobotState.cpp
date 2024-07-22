@@ -20,8 +20,6 @@ void RobotState::set(flt* p_, flt* v_, flt* q_, flt* w_, flt* r_,flt yaw_, int r
     this->q.z() = q_[3];
     this->yaw = yaw_;
 
-    //for(u8 i = 0; i < 12; i++)
-    //    this->r_feet(i) = r[i];
     for(u8 rs = 0; rs < 3; rs++)
         for(u8 c = 0; c < 4; c++)
             this->r_feet(rs,c) = r_[rs*4 + c];

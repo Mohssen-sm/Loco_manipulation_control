@@ -75,16 +75,18 @@ void FSMState_QPStand::enter()
             rpy[i] = 0; 
             kpCOM[i] = 30;  
             kdCOM[i] = 20;  
-            kpBase[i] = 80;  
-            kdBase[i] = 30; 
+            kpBase[i] = 100;  
+            kdBase[i] = 20; 
         }
         
         kpCOM[2] = 50;
         kpBase[0] = 600;
-        kpBase[1] = 500; 
+        kpBase[1] = 500;	
+	    kpBase[2] = 200;
         rpy[2] = init_yaw;
-        p_des[2] = 0.4;
-        balanceController.Ig << 0.1831 , 0, 0, 0, 0.7563, 0, 0, 0, 0.7837; 
+        p_des[2] = 0.3;
+        
+        balanceController.Ig << 0.0792 , 0, 0, 0, 0.2085, 0, 0, 0, 0.2265; 
     }
     else{
         std::cout << "robot not defined for QP controller" << std::endl;
@@ -147,7 +149,6 @@ void FSMState_QPStand::run()
     balanceController.SetContactData(contactStateScheduled, minForces, maxForces);
     balanceController.updateProblemData(se_xfb, pFeet, p_des, p_act, v_des, v_act,
                                       O_err, _data->_stateEstimator->getResult().rpy(2));
-   // balanceController.print_QPData();
     double fOpt[12];
     balanceController.solveQP_nonThreaded(fOpt);
 

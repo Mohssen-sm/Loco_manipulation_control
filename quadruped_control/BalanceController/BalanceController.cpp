@@ -32,14 +32,6 @@ BalanceController::BalanceController()
 
   QPFinished = false;
 
-  //lcm = new lcm::LCM("udpm://239.255.76.67:7667?ttl=1");
-  //if (lcm->good()) {
-  //  printf("LCM IN BALANCE CONTROL INITIALIZED\n");
-  //} else {
-  //  printf("LCM IN BALANCE CONTROLLER FAILED\n");
-  //  exit(-1);
-  //}
-
   // Eigen QP matrices
   H_eigen.resize(NUM_VARIABLES_QP, NUM_VARIABLES_QP);
   A_eigen.resize(NUM_CONSTRAINTS_QP, NUM_VARIABLES_QP);
@@ -128,10 +120,6 @@ BalanceController::BalanceController()
   for (int i = 0; i < NUM_VARIABLES_QP + NUM_CONSTRAINTS_QP; i++) {
     yOpt_qpOASES[i] = 0.0;
   }
-
-  //    FullStateData.p 1.000000 -0.131507
-  // FullStateData.p 2.000000 -0.000000
-  // FullStateData.p 3.000000 0.571957
 
   set_QPWeights();
   set_RobotLimits();
@@ -572,11 +560,6 @@ void BalanceController::set_desiredTrajectoryData(
   rpyToR(R_b_world_desired, rpy_des_in);
   omega_b_world_desired << omegab_des_in[0], omegab_des_in[1], omegab_des_in[2];
   xdot_COM_world_desired << v_des_in[0], v_des_in[1], v_des_in[2];
-  //std::cout << "rpy_des: " << std::endl;
-  //std::cout << rpy_des_in[0] << " " <<  rpy_des_in[1] << " " << rpy_des_in[2] << std::endl;
-  //std::cout << "R_b_world_des: " << std::endl;
-  //std::cout << R_b_world_desired << std::endl;
-  // xddot_COM_world_desired << vdot_des_in[0], vdot_des_in[1], vdot_des_in[2];
 }
 
 void BalanceController::set_wrench_weights(double* COM_weights_in,

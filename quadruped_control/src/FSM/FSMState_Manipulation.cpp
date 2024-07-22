@@ -12,14 +12,11 @@ T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim 
 
 void FSMState_Manipulation::enter()
 {
-    // v_des_body << 0, 0, 0;
     pitch = 0;
     roll = 0;
-    //  _data->_interface->zeroCmdPanel();
     counter = 0;
     Cmpc.firstRun = true;
     _data->_stateEstimator->run();
-    // _data->_legController->zeroCommand();
 }
 
 void FSMState_Manipulation::run()

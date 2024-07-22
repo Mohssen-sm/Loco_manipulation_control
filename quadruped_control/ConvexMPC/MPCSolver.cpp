@@ -272,11 +272,6 @@ void MPCSolver::c2qp(Eigen::Matrix<fpt, 3, 3> I_world, fpt m, Eigen::Matrix<fpt,
   Adt = expmm.block(0, 0, state_num, state_num);
   Bdt = expmm.block(0, state_num, state_num, control_num);
 
-#ifdef K_PRINT_EVERYTHING
-  cout << "Adt: \n"
-       << Adt << "\nBdt:\n"
-       << Bdt << endl;
-#endif
   if (horizon > 19)
   {
     throw std::runtime_error("horizon is too long!");
@@ -300,29 +295,11 @@ void MPCSolver::c2qp(Eigen::Matrix<fpt, 3, 3> I_world, fpt m, Eigen::Matrix<fpt,
       }
     }
   }
-#ifdef K_PRINT_EVERYTHING
-  cout << "AQP:\n"
-       << A_qp << "\nBQP:\n"
-       << B_qp << endl;
-#endif
 }
 
 void MPCSolver::solve_mpc()
 {
   rs.set(update.p, update.v, update.q, update.w, update.r, update.yaw, update.robot_type);
-#ifdef K_PRINT_EVERYTHING
-
-  printf("-----------------\n");
-  printf("   PROBLEM DATA  \n");
-  printf("-----------------\n");
-  print_problem_setup(setup);
-
-  printf("-----------------\n");
-  printf("    ROBOT DATA   \n");
-  printf("-----------------\n");
-  rs.print();
-  print_update_data(update, setup.horizon);
-#endif
 
   // roll pitch yaw
   Eigen::Matrix<fpt, 3, 1> rpy;
@@ -343,16 +320,6 @@ void MPCSolver::solve_mpc()
         -manipulation_force[0] / rs.m, -manipulation_force[1] / rs.m;
   }
 
-#ifdef K_PRINT_EVERYTHING
-  cout << "Initial state: \n"
-       << x_0 << endl;
-  cout << "World Inertia: \n"
-       << I_world << endl;
-  cout << "A CT: \n"
-       << A_ct << endl;
-  cout << "B CT (simplified): \n"
-       << B_ct_r << endl;
-#endif
   // QP matrices
   c2qp(rs.I_world, rs.m, rs.r_feet, rs.R_yaw, setup.dt, setup.horizon);
 
