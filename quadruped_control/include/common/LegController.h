@@ -35,14 +35,14 @@
  */ 
     struct LegControllerData{
         LegControllerData() {zero();}
-        void setQuadruped(Quadruped& quad) { aliengo = &quad; }
+        void setQuadruped(Quadruped& quad) { quadptr = &quad; }
 
         void zero();
         Vec3<double> q, qd;
         Vec3<double> p, v;
         Mat3<double> J;
         Vec3<double> tau;
-        Quadruped* aliengo;
+        Quadruped* quadptr;
     };
 
 /*!
@@ -55,8 +55,6 @@
             for(int i = 0; i<4; i++){
                 commands[i].zero();
                 data[i].zero();
-            //    commands[i].kdCartesian << 100, 0, 0, 0, 100, 0, 0 ,0, 100;
-            //    commands[i].kpCartesian << 100, 0, 0, 0, 100, 0, 0 ,0, 100;
             }
         };
         
@@ -70,12 +68,7 @@
         LegControllerCommand commands[4];
         LegControllerData data[4];
         bool _legsEnabled = false;
-        /*!
-        * compute foot jacobian and position in leg frame
-        */ 
         Quadruped& _quadruped;
-        //CurrentState& curr;
-        //ros::NodeHandle n;
     };
 
     void computeLegJacobianAndPosition(Quadruped& _quad, Vec3<double>& q, Mat3<double>* J,
