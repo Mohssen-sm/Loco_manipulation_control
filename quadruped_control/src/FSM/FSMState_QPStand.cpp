@@ -31,7 +31,7 @@ void FSMState_QPStand::enter()
     _data->_stateEstimator->run();
 
     init_yaw = _data->_stateEstimator->getResult().rpy(2);
-    balanceController.Ig = _data->_quadruped->Ig.diagonal();
+    balanceController.Ig = _data->_quadruped->Ig.asDiagonal();
     for (int i = 0; i < 3; i++)
     {
         p_des[i] = _data->_stateEstimator->getResult().position(i);
