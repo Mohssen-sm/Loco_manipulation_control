@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include "CmdPanel.h"
-#include "../common/cppTypes.h"
+#include <common/cppTypes.h>
 
 class KeyBoard : public CmdPanel{
 public:

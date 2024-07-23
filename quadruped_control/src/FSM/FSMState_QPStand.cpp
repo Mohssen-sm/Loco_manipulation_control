@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSMState_QPStand.h"
+#include <FSM/FSMState_QPStand.h>
 
 FSMState_QPStand::FSMState_QPStand(ControlFSMData *data)
     : FSMState(data, FSMStateName::QPSTAND, "QPStand")

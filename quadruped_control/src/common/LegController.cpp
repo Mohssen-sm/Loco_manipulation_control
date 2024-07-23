@@ -1,4 +1,4 @@
-#include "../../include/common/LegController.h"
+#include <common/LegController.h>
 
 // upper level of joint controller 
 // send data to joint controller

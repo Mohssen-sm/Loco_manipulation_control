@@ -11,7 +11,7 @@
 #include <random>
 #include <unordered_map>
 #include <vector>
-#include "../cppTypes.h"
+#include <common/cppTypes.h>
 
 /*!
  * Are two floating point values almost equal?

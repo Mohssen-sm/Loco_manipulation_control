@@ -1,8 +1,8 @@
 #ifndef LocoManipulationMPC_H
 #define LocoManipulationMPC_H
 
-#include "MPCLocoMotion.h"
-#include "MPCSolver.h"
+#include <ConvexMPC/MPCLocoMotion.h>
+#include <ConvexMPC/MPCSolver.h>
 
 class LocoManipulationMPC : public MPCLocomotion
 {

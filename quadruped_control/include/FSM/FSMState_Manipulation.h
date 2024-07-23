@@ -2,7 +2,7 @@
 #define Manipulation_H
 
 #include "FSMState.h"
-#include "../../ConvexMPC/LocoManipulationMPC.h"
+#include <ConvexMPC/LocoManipulationMPC.h>
 
 class FSMState_Manipulation: public FSMState
 {

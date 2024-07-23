@@ -1,4 +1,4 @@
-#include "../../include/common/DesiredCommand.h"
+#include <common/DesiredCommand.h>
 
 void DesiredStateData::zero(){
     pre_stateDes = Vec12<double>::Zero();

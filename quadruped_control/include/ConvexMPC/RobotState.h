@@ -7,7 +7,7 @@
 using Eigen::Quaternionf;
 
 #include "common_types.h"
-#include "../include/common/Quadruped.h"
+#include <common/Quadruped.h>
 class RobotState
 {
 public:

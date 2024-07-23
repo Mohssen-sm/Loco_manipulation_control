@@ -4,13 +4,12 @@
 #include <fstream>
 #include <stdio.h>
 #include <iostream>
-#include "../include/common/Utilities/Timer.h"
-#include "../include/common/Math/orientation_tools.h"
-#include "../include/common/cppTypes.h"
-#include "../include/common/FootSwingTrajectory.h"
-#include "../include/common/ControlFSMData.h"
-#include "Gait.h"
-// #include "MPCSolver.h"
+#include <common/Utilities/Timer.h>
+#include <common/Math/orientation_tools.h>
+#include <common/cppTypes.h>
+#include <common/FootSwingTrajectory.h>
+#include <common/ControlFSMData.h>
+#include <ConvexMPC/Gait.h>
 
 using namespace std;
 

@@ -15,9 +15,8 @@ Cheetah-3-Documentation-Control:
    qpOASES variables are terminated with _qpOASES
 */
 
-#include "BalanceController.hpp"
+#include <BalanceController/BalanceController.hpp>
 #include <iostream>
-// #include "Sim_Utils.h"
 
 using namespace std;
 

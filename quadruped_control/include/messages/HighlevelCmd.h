@@ -2,8 +2,8 @@
 #define HIGHLEVELCMD_H
 
 #include <iostream>
-#include "../common/cppTypes.h"
-#include "../common/enumClass.h"
+#include <common/cppTypes.h>
+#include <common/enumClass.h>
 
 struct HighlevelCmd
 {

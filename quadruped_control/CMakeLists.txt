@@ -1,13 +1,7 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 project(quadruped_control)
 
-set(CMAKE_CXX_STANDARD 14)
-
-include_directories(${CMAKE_BINARY_DIR})
-set(CMAKE_C_FLAGS "-O3  -ggdb  -march=native -std=gnu99 -I.")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "-lboost_system -fext-numeric-literals -O3") 
-add_definitions(-DEIGEN_STACK_ALLOCATION_LIMIT=0)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(catkin REQUIRED 
     COMPONENTS
@@ -26,7 +20,6 @@ find_package(catkin REQUIRED
 )
 find_package(gazebo REQUIRED)
 find_package(Boost REQUIRED)
-#find_package(qpoases)
 
 catkin_package(
     INCLUDE_DIRS
@@ -43,7 +36,6 @@ include_directories(
     ${Boost_INCLUDE_DIR}
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
-    #${GAZEBO_LIBRARY_DIRS}
 )
 
 link_directories(
@@ -51,14 +43,13 @@ link_directories(
     ${GAZEBO_LIBRARY_DIRS}
 )
 
-# add_subdirectory(third_party/qpOASES)
-
 file(GLOB_RECURSE SRC_LIST
 "src/*/*.cpp"
 "src/*/*.cc"
 "BalanceController/*.cpp"
 "ConvexMPC/*.cpp"
 )
+
 add_executable(quad_control src/quad_control.cpp  ${SRC_LIST} )
 target_link_libraries(quad_control ${catkin_LIBRARIES} -pthread lcm)
 

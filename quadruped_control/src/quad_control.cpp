@@ -4,13 +4,13 @@
 #include <sched.h>
 #include <string>
 
-#include "../include/common/ControlFSMData.h"
-#include "../include/common/ContactEstimator.h"
-#include "../include/common/OrientationEstimator.h"
-#include "../include/common/PositionVelocityEstimator.h"
-#include "../include/interface/IOROS.h"
-#include "../include/interface/KeyBoard.h"
-#include "../include/FSM/FSM.h"
+#include <common/ControlFSMData.h>
+#include <common/ContactEstimator.h>
+#include <common/OrientationEstimator.h>
+#include <common/PositionVelocityEstimator.h>
+#include <interface/IOROS.h>
+#include <interface/KeyBoard.h>
+#include <FSM/FSM.h>
 
 bool running = true;
 

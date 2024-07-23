@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSMState_ThreeFoot.h"
+#include <FSM/FSMState_ThreeFoot.h>
 
 FSMState_ThreeFoot::FSMState_ThreeFoot(ControlFSMData *data)
                  :FSMState(data, FSMStateName::THREEFOOT, "Threefoot")

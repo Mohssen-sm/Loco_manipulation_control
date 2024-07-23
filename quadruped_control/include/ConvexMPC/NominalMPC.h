@@ -1,8 +1,8 @@
 #ifndef NOMINALMPC_H
 #define NOMINALMPC_H
 
-#include "MPCLocoMotion.h"
-#include "MPCSolver.h"
+#include <ConvexMPC/MPCLocoMotion.h>
+#include <ConvexMPC/MPCSolver.h>
 
 class NominalMPC : public MPCLocomotion
 {

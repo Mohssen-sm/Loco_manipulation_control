@@ -14,7 +14,7 @@
 #pragma once
 
 #include "LegController.h"
-#include "../messages/LowlevelState.h"
+#include <messages/LowlevelState.h>
 
 /*!
  * "Cheater" state sent to robot from simulation

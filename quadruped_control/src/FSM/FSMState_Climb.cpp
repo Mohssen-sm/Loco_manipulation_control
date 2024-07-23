@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSMState_Climb.h"
+#include <FSM/FSMState_Climb.h>
 
 FSMState_Climb::FSMState_Climb(ControlFSMData *data)
                :FSMState(data, FSMStateName::CLIMB, "climb"),

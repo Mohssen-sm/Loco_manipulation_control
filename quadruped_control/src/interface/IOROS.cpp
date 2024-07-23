@@ -1,5 +1,5 @@
-#include "../../include/interface/IOROS.h"
-#include "../../include/interface/KeyBoard.h"
+#include <interface/IOROS.h>
+#include <interface/KeyBoard.h>
 #include <iostream>
 #include <unistd.h>
 #include <csignal>

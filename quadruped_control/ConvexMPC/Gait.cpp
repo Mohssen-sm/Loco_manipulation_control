@@ -1,4 +1,4 @@
-#include "Gait.h"
+#include <ConvexMPC/Gait.h>
 
 Gait::Gait(int nMPC_segments, Vec4<int> offsets, Vec4<int> durations, const std::string& name) :
   _offsets(offsets.array()),

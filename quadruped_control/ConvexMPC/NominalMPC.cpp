@@ -1,6 +1,6 @@
 #include <iostream>
-#include "NominalMPC.h"
-#include "../include/common/Math/orientation_tools.h"
+#include <ConvexMPC/NominalMPC.h>
+#include <common/Math/orientation_tools.h>
 
 using namespace ori;
 

@@ -1,6 +1,6 @@
 #include <iostream>
-#include "LocoManipulationMPC.h"
-#include "../include/common/Math/orientation_tools.h"
+#include <ConvexMPC/LocoManipulationMPC.h>
+#include <common/Math/orientation_tools.h>
 
 using namespace ori;
 

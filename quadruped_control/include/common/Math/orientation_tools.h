@@ -21,7 +21,7 @@
 #include <type_traits>
 
 #include "MathUtilities.h"
-#include "../cppTypes.h"
+#include <common/cppTypes.h>
 
 namespace ori {
 

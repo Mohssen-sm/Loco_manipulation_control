@@ -2,7 +2,7 @@
 #define GAIT
 
 #include "common_types.h"
-#include "../include/common/cppTypes.h"
+#include <common/cppTypes.h>
 #include <fstream>
 #include <stdio.h>
 

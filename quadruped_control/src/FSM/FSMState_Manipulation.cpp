@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSMState_Manipulation.h"
+#include <FSM/FSMState_Manipulation.h>
 
 FSMState_Manipulation::FSMState_Manipulation(ControlFSMData *data)
     : FSMState(data, FSMStateName::MANIPULATION, "manipulation"),

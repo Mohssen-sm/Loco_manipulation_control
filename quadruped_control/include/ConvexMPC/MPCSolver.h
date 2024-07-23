@@ -9,8 +9,8 @@
 #include <sys/time.h>
 #include "common_types.h"
 #include <qpOASES.hpp>
-#include "../include/common/Utilities/Timer.h"
-#include "../include/common/cppTypes.h"
+#include <common/Utilities/Timer.h>
+#include <common/cppTypes.h>
 #include "RobotState.h"
 
 using Eigen::Dynamic;

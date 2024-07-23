@@ -1,8 +1,7 @@
-#include "BalanceControllerWrapper.h"
+#include <BalanceController/BalanceControllerWrapper.h>
 #include <cstdlib>
 #include <iostream>
-#include "BalanceController.hpp"
-
+#include <BalanceController/BalanceController.hpp>
 #ifdef __cplusplus
 extern "C" {
 #endif

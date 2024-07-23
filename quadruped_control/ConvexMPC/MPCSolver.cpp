@@ -1,5 +1,5 @@
-#include "MPCSolver.h"
-#include "utils.h"
+#include <ConvexMPC/MPCSolver.h>
+#include <ConvexMPC/utils.h>
 
 MPCSolver::MPCSolver(double dt, int horizon, double mu, double f_max, Quadruped *quad) : rs(quad)
 {

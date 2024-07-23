@@ -1,8 +1,8 @@
 #ifndef CLIMB_H
 #define CLIMB_H
 
-#include "FSMState.h"
-#include "../../ConvexMPC/StairMPC.h"
+#include <FSM/FSMState.h>
+#include <ConvexMPC/StairMPC.h>
 
 class FSMState_Climb: public FSMState
 {

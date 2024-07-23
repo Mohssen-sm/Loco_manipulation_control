@@ -1,6 +1,6 @@
 #include <iostream>
-#include "StairMPC.h"
-#include "../include/common/Math/orientation_tools.h"
+#include <ConvexMPC/StairMPC.h>
+#include <common/Math/orientation_tools.h>
 
 using namespace ori;
 

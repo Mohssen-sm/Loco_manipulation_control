@@ -1,4 +1,4 @@
-#include "MPCLocoMotion.h"
+#include <ConvexMPC/MPCLocoMotion.h>
 
 MPCLocomotion::MPCLocomotion(double _dt, int horizon, Quadruped *quad) : horizonLength(horizon),
                                                                          dt(_dt),

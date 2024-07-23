@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSMState_Walking.h"
+#include <FSM/FSMState_Walking.h>
 
 FSMState_Walking::FSMState_Walking(ControlFSMData *data)
                  :FSMState(data, FSMStateName::WALKING, "walking"),

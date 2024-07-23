@@ -11,8 +11,8 @@
 #define LEGCONTROLLER_H
 
 #include "cppTypes.h"
-#include "../messages/LowlevelState.h"
-#include "../messages/LowLevelCmd.h"
+#include <messages/LowlevelState.h>
+#include <messages/LowLevelCmd.h>
 #include "Quadruped.h"
 
 /*!

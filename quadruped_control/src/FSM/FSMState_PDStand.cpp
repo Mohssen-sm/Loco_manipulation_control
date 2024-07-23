@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/FSM/FSMState_PDStand.h"
+#include <FSM/FSMState_PDStand.h>
 
 FSMState_PDStand::FSMState_PDStand(ControlFSMData *data)
     : FSMState(data, FSMStateName::PDSTAND, "PDStand") {}
