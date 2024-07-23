@@ -33,16 +33,6 @@ catkin_package(
     LIBRARIES
     ${PROJECT_NAME}
     CATKIN_DEPENDS 
-    controller_manager
-    genmsg
-    joint_state_controller
-    robot_state_publisher
-    roscpp
-    gazebo_ros
-    gazebo_msgs
-    std_msgs
-    tf
-    geometry_msgs
     unitree_legged_msgs 
     qpoases_catkin
 )
