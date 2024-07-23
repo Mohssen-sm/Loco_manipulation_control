@@ -19,7 +19,13 @@ find_package(catkin REQUIRED
     qpoases_catkin 
 )
 find_package(gazebo REQUIRED)
-find_package(Boost REQUIRED)
+
+find_package(Boost REQUIRED COMPONENTS
+        system
+        filesystem
+        )
+
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 catkin_package(
     INCLUDE_DIRS
@@ -27,13 +33,24 @@ catkin_package(
     LIBRARIES
     ${PROJECT_NAME}
     CATKIN_DEPENDS 
+    controller_manager
+    genmsg
+    joint_state_controller
+    robot_state_publisher
+    roscpp
+    gazebo_ros
+    gazebo_msgs
+    std_msgs
+    tf
+    geometry_msgs
     unitree_legged_msgs 
-    qpoases_catkin 
+    qpoases_catkin
 )
 
 include_directories(
     include
     ${Boost_INCLUDE_DIR}
+    ${EIGEN3_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
 )
@@ -45,12 +62,19 @@ link_directories(
 
 file(GLOB_RECURSE SRC_LIST
 "src/*/*.cpp"
-"src/*/*.cc"
-"BalanceController/*.cpp"
-"ConvexMPC/*.cpp"
 )
 
-add_executable(quad_control src/quad_control.cpp  ${SRC_LIST} )
-target_link_libraries(quad_control ${catkin_LIBRARIES} -pthread lcm)
+add_library(${PROJECT_NAME}
+    ${SRC_LIST}
+        )
+
+target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )        
+
+# quad_control node
+add_executable(quad_control src/quad_control.cpp)
+add_dependencies(quad_control ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(quad_control ${PROJECT_NAME} ${catkin_LIBRARIES} -pthread lcm)
 
 
