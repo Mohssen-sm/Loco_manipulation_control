@@ -1,9 +1,8 @@
-#include "../../include/FSM/FSMState_Walking.h"
+#include <FSM/FSMState_Walking.h>
 
 FSMState_Walking::FSMState_Walking(ControlFSMData *data)
                  :FSMState(data, FSMStateName::WALKING, "walking"),
-                //  Cmpc(0.001, 30){}
-                 Cmpc(0.001, 50, 10){}
+                 Cmpc(0.001, 10, data->_quadruped){}
 
 template<typename T0, typename T1, typename T2>
 T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim = -1, const double maxLim = 1){

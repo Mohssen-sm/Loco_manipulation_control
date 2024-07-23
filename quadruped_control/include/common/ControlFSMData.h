@@ -1,13 +1,13 @@
 #ifndef CONTROLFSMDATA_H
 #define CONTROLFSMDATA_H
 
-#include "DesiredCommand.h"
-#include "LegController.h"
-#include "Quadruped.h"
-#include "../messages/LowLevelCmd.h"
-#include "../messages/LowlevelState.h"
-#include "../interface/IOInterface.h"
-#include "StateEstimatorContainer.h"
+#include <common/DesiredCommand.h>
+#include <common/LegController.h>
+#include <common/Quadruped.h>
+#include <messages/LowLevelCmd.h>
+#include <messages/LowlevelState.h>
+#include <interface/IOInterface.h>
+#include <common/StateEstimatorContainer.h>
 
 struct ControlFSMData {
   // EIGEN_MAKE_ALIGNED_OPERATOR_NEW

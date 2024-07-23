@@ -1,8 +1,8 @@
 #ifndef THREEFOOT_H
 #define THREEFOOT_H
 
-#include "FSMState.h"
-#include "../../BalanceController/BalanceController.hpp"
+#include <FSM/FSMState.h>
+#include <BalanceController/BalanceController.hpp>
 
 class FSMState_ThreeFoot: public FSMState
 {

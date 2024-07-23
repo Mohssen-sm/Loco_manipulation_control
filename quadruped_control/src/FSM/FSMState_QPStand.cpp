@@ -1,7 +1,7 @@
-#include "../../include/FSM/FSMState_QPStand.h"
+#include <FSM/FSMState_QPStand.h>
 
 FSMState_QPStand::FSMState_QPStand(ControlFSMData *data)
-                 :FSMState(data, FSMStateName::QPSTAND, "QPStand")
+    : FSMState(data, FSMStateName::QPSTAND, "QPStand")
 {
     _rollMax = 30 * M_PI / 180;
     _rollMin = -_rollMax;
@@ -13,9 +13,9 @@ FSMState_QPStand::FSMState_QPStand(ControlFSMData *data)
     _heightMin = 0.15;
     _forwardMax = 0.1;
     _backwardMax = -0.1;
-    
+
     footFeedForwardForces.setZero();
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         minForces[i] = minForce;
         maxForces[i] = maxForce;
@@ -23,80 +23,84 @@ FSMState_QPStand::FSMState_QPStand(ControlFSMData *data)
 }
 
 void FSMState_QPStand::enter()
-{   
+{
     counter = 0;
-     _data->_interface->zeroCmdPanel();
+    _data->_interface->zeroCmdPanel();
     _data->_legController->zeroCommand();
     _data->_legController->updateData(_data->_lowState);
     _data->_stateEstimator->run();
 
     init_yaw = _data->_stateEstimator->getResult().rpy(2);
-    if(_data->_quadruped->robot_index == 1){
-        for(int i = 0; i < 3; i++)
-        {
-            p_des[i] = _data->_stateEstimator->getResult().position(i);
-            rpy[i] = 0; 
-            kpCOM[i] = 40;  
-            kdCOM[i] = 20;  
-            kpBase[i] = 100;  
-            kdBase[i] = 35; 
-        }
-        
-        kpCOM[2] = 60;
-        kpBase[0] = 800;
-        kpBase[1] = 750; 
-        rpy[2] = init_yaw;
-        p_des[2] = 0.4;
-        balanceController.Ig << 0.050874, 0, 0, 0, 0.64036, 0, 0, 0, 0.65655;
+    balanceController.Ig = _data->_quadruped->Ig.asDiagonal();
+    for (int i = 0; i < 3; i++)
+    {
+        p_des[i] = _data->_stateEstimator->getResult().position(i);
+        rpy[i] = 0;
     }
-    else if(_data->_quadruped->robot_index == 2){
-        for(int i = 0; i < 3; i++)
+    p_des[2] = _data->_quadruped->COM_height;
+    rpy[2] = init_yaw;
+
+    if (_data->_quadruped->robot_index == 1)
+    {
+        for (int i = 0; i < 3; i++)
         {
-            p_des[i] = _data->_stateEstimator->getResult().position(i);
-            rpy[i] = 0; 
-            kpCOM[i] = 30;  
-            kdCOM[i] = 5;  
-            kpBase[i] = 80;  
-            kdBase[i] = 20; 
+            kpCOM[i] = 30;
+            kdCOM[i] = 10;
+            kpBase[i] = 100;
+            kdBase[i] = 20;
         }
-        
-        kpCOM[2] = 40;
-        // kpBase[0] = 400;
-        // kpBase[1] = 200; 
-        rpy[2] = init_yaw;
-        p_des[2] = 0.3;
-        balanceController.Ig << .0168, 0.0, 0.0, 0.0, 0.0565, 0.0, 0.0, 0.0, 0.064;
+
+        kpCOM[2] = 95;
+        kpBase[0] = 600;
+        kpBase[1] = 450;
+    }
+    else if (_data->_quadruped->robot_index == 2)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            kpCOM[i] = 40;
+            kdCOM[i] = 20;
+            kpBase[i] = 200;
+            kdBase[i] = 20;
+        }
+
+        kpCOM[2] = 65;
+        kpBase[0] = 600;
+        kpBase[1] = 500;
     }
 
-    else if(_data->_quadruped->robot_index == 3){
-        for(int i = 0; i < 3; i++)
+    else if (_data->_quadruped->robot_index == 3)
+    {
+        for (int i = 0; i < 3; i++)
         {
-            p_des[i] = _data->_stateEstimator->getResult().position(i);
-            rpy[i] = 0; 
-            kpCOM[i] = 30;  
-            kdCOM[i] = 20;  
-            kpBase[i] = 80;  
-            kdBase[i] = 30; 
+            kpCOM[i] = 30;
+            kdCOM[i] = 20;
+            kpBase[i] = 100;
+            kdBase[i] = 20;
         }
-        
+
         kpCOM[2] = 50;
         kpBase[0] = 600;
-        kpBase[1] = 500; 
-        rpy[2] = init_yaw;
-        p_des[2] = 0.4;
-        balanceController.Ig << 0.1831 , 0, 0, 0, 0.7563, 0, 0, 0, 0.7837; 
+        kpBase[1] = 500;
+        kpBase[2] = 200;
+        COM_weights_stance[2] = 15;
+        Base_weights_stance[0] = 10;
+        Base_weights_stance[1] = 10;
+        Base_weights_stance[2] = 20;
+
     }
-    else{
+    else
+    {
         std::cout << "robot not defined for QP controller" << std::endl;
         exit();
     }
 }
 
-template<typename T0, typename T1, typename T2>
-T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim = -1, const double maxLim = 1){
-	return (value-minLim)*(max-min)/(maxLim-minLim) + min;
+template <typename T0, typename T1, typename T2>
+T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim = -1, const double maxLim = 1)
+{
+    return (value - minLim) * (max - min) / (maxLim - minLim) + min;
 }
-
 
 void FSMState_QPStand::run()
 {
@@ -104,31 +108,33 @@ void FSMState_QPStand::run()
     _data->_stateEstimator->run();
     _userValue = _data->_lowState->userValue;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         se_xfb[i] = _data->_stateEstimator->getResult().orientation(i);
     }
-     
-    for (int i = 0; i < 3; i++) {
+
+    for (int i = 0; i < 3; i++)
+    {
         p_act[i] = _data->_stateEstimator->getResult().position(i);
-        
+
         v_act[i] = _data->_stateEstimator->getResult().vWorld(i);
 
         se_xfb[4 + i] = _data->_stateEstimator->getResult().position(i);
         se_xfb[7 + i] = _data->_stateEstimator->getResult().omegaWorld(i);
         se_xfb[10 + i] = _data->_stateEstimator->getResult().vWorld(i);
-      }
+    }
 
-          Vec3<double> pFeetVecCOM;
+    Vec3<double> pFeetVecCOM;
 
     // Get the foot locations relative to COM
-    for (int leg = 0; leg < 4; leg++) {
-        pFeetVecCOM =  _data->_stateEstimator->getResult().rBody.transpose() *
-        (_data->_quadruped->getHipLocation(leg) + _data->_legController->data[leg].p);
+    for (int leg = 0; leg < 4; leg++)
+    {
+        pFeetVecCOM = _data->_stateEstimator->getResult().rBody.transpose() *
+                      (_data->_quadruped->getHipLocation(leg) + _data->_legController->data[leg].p);
 
         pFeet[leg * 3] = pFeetVecCOM[0];
         pFeet[leg * 3 + 1] = pFeetVecCOM[1];
         pFeet[leg * 3 + 2] = pFeetVecCOM[2];
-        //std::cout << "pFeet" << leg << std::endl;
     }
 
     rpy[0] = (double)invNormalize(_userValue.lx, _rollMin, _rollMax);
@@ -146,18 +152,17 @@ void FSMState_QPStand::run()
     balanceController.set_desiredTrajectoryData(rpy, p_des, omegaDes, v_des);
     balanceController.SetContactData(contactStateScheduled, minForces, maxForces);
     balanceController.updateProblemData(se_xfb, pFeet, p_des, p_act, v_des, v_act,
-                                      O_err, _data->_stateEstimator->getResult().rpy(2));
-   // balanceController.print_QPData();
+                                        O_err, _data->_stateEstimator->getResult().rpy(2));
     double fOpt[12];
     balanceController.solveQP_nonThreaded(fOpt);
 
-
-    for (int leg = 0; leg < 4; leg++) {
+    for (int leg = 0; leg < 4; leg++)
+    {
         footFeedForwardForces.col(leg) << fOpt[leg * 3], fOpt[leg * 3 + 1],
-        fOpt[leg * 3 + 2]; // force in world frame, need to convert to body frame
-        
+            fOpt[leg * 3 + 2]; // force in world frame, need to convert to body frame
+
         _data->_legController->commands[leg].feedforwardForce = footFeedForwardForces.col(leg);
-        // _data->_legController->commands[leg].kpJoint.diagonal() << 0.5, 0.5, 0.5;
+        _data->_legController->commands[leg].kdJoint.diagonal() << 1, 1 ,1;
     }
 
     _data->_legController->updateCommand(_data->_lowCmd);
@@ -172,31 +177,38 @@ void FSMState_QPStand::exit()
 
 FSMStateName FSMState_QPStand::checkTransition()
 {
-    if(_lowState->userCmd == UserCommand::L2_A){
+    if (_lowState->userCmd == UserCommand::L2_A)
+    {
         std::cout << "transition from QP stand to PD stand" << std::endl;
         return FSMStateName::PDSTAND;
     }
-    else if(_lowState->userCmd == UserCommand::L2_Y){
+    else if (_lowState->userCmd == UserCommand::L2_Y)
+    {
         std::cout << "transition from QP stand to 3 foot" << std::endl;
         return FSMStateName::THREEFOOT;
     }
-    else if(_lowState->userCmd == UserCommand::START){
+    else if (_lowState->userCmd == UserCommand::START)
+    {
         std::cout << "transition from QP stand to walk" << std::endl;
         return FSMStateName::WALKING;
     }
-    else if(_lowState->userCmd == UserCommand::L1_A){
+    else if (_lowState->userCmd == UserCommand::L1_A)
+    {
         std::cout << "transition from QP stand to Manipulation" << std::endl;
         return FSMStateName::MANIPULATION;
     }
-    else if(_lowState->userCmd == UserCommand::L2_X){
+    else if (_lowState->userCmd == UserCommand::L2_X)
+    {
         std::cout << "transition from QP stand to climb" << std::endl;
         return FSMStateName::CLIMB;
     }
-    if(_lowState->userCmd == UserCommand::L2_B){
+    if (_lowState->userCmd == UserCommand::L2_B)
+    {
         std::cout << "transition from QP stand to passive" << std::endl;
         return FSMStateName::PASSIVE;
     }
-    else{
+    else
+    {
         return FSMStateName::QPSTAND;
     }
 }

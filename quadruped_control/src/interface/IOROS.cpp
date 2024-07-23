@@ -1,5 +1,5 @@
-#include "../../include/interface/IOROS.h"
-#include "../../include/interface/KeyBoard.h"
+#include <interface/IOROS.h>
+#include <interface/KeyBoard.h>
 #include <iostream>
 #include <unistd.h>
 #include <csignal>
@@ -10,7 +10,7 @@ inline void RosShutDown(int sig)
     ros::shutdown();
 }
 
-IOROS::IOROS(std::string robot_name) : IOInterface()
+IOROS::IOROS() : IOInterface()
 {
     // start subscriber
     initRecv();
@@ -198,7 +198,6 @@ void IOROS::StateCallback(const gazebo_msgs::ModelStates &msg)
         if (msg.name[i] == _nm.getNamespace().substr(1))
         {
             robot_index = i;
-            // std::cout << msg.name[i] << std::endl;
         }
     }
 

@@ -11,7 +11,7 @@
 #ifndef PROJECT_CONTACTESTIMATOR_H
 #define PROJECT_CONTACTESTIMATOR_H
 
-#include "StateEstimatorContainer.h"
+#include <common/StateEstimatorContainer.h>
 
 
 /*!

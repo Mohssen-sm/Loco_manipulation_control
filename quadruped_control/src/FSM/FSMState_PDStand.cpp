@@ -1,25 +1,34 @@
 #include <iostream>
-#include "../../include/FSM/FSMState_PDStand.h"
+#include <FSM/FSMState_PDStand.h>
 
 FSMState_PDStand::FSMState_PDStand(ControlFSMData *data)
-                :FSMState(data, FSMStateName::PDSTAND, "PDStand"){}
+    : FSMState(data, FSMStateName::PDSTAND, "PDStand") {}
 
 void FSMState_PDStand::enter()
 {
     _data->_legController->updateData(_data->_lowState);
     _data->_legController->zeroCommand();
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
-        _data->_legController->commands[i].kpJoint << 60, 0, 0,
-                                                      0, 60, 0,
-                                                      0, 0, 60;
-
-        _data->_legController->commands[i].kdJoint << 5, 0, 0,
-                                                      0, 5, 0,
-                                                      0, 0, 5;
-        for(int j = 0; j < 3; j++)
+        if (_data->_quadruped->robot_index == 1 || _data->_quadruped->robot_index == 2) // a1 and aliengo
         {
-            _startPos[i*3+j] = _data->_legController->data[i].q(j);
+            _data->_legController->commands[i].kpJoint << 80, 0, 0,
+                                                          0, 80, 0,
+                                                          0, 0, 80;
+        }
+        else if (_data->_quadruped->robot_index == 3) // go1
+        {
+            _data->_legController->commands[i].kpJoint << 60, 0, 0,
+                                                          0, 60, 0,
+                                                          0, 0, 60;
+        }
+
+        _data->_legController->commands[i].kdJoint << 3, 0, 0,
+                                                      0, 3, 0,
+                                                      0, 0, 3;
+        for (int j = 0; j < 3; j++)
+        {
+            _startPos[i * 3 + j] = _data->_legController->data[i].q(j);
         }
     }
 }
@@ -27,16 +36,15 @@ void FSMState_PDStand::enter()
 void FSMState_PDStand::run()
 {
     _data->_legController->updateData(_data->_lowState);
-    _data->_stateEstimator->run(); 
-    _percent += 1.0/_duration;
+    _data->_stateEstimator->run();
+    _percent += 1.0 / _duration;
     _percent = _percent > 1 ? 1 : _percent;
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
-        for(int j = 0; j < 3; j++)
+        for (int j = 0; j < 3; j++)
         {
-            _data->_legController->commands[i].qDes(j) = (1 - _percent) * _startPos[i*3+j] + _percent * _targetPos[i*3+j];
+            _data->_legController->commands[i].qDes(j) = (1 - _percent) * _startPos[i * 3 + j] + _percent * _targetPos[i * 3 + j];
         }
-
     }
     _data->_legController->updateCommand(_data->_lowCmd);
 }
@@ -49,15 +57,18 @@ void FSMState_PDStand::exit()
 
 FSMStateName FSMState_PDStand::checkTransition()
 {
-    if(_lowState->userCmd == UserCommand::L2_B){
+    if (_lowState->userCmd == UserCommand::L2_B)
+    {
         std::cout << "transition from PD stand to passive" << std::endl;
         return FSMStateName::PASSIVE;
     }
-    else if(_lowState->userCmd == UserCommand::L2_A){
+    else if (_lowState->userCmd == UserCommand::L2_A)
+    {
         std::cout << "transition from PD stand to QP stand" << std::endl;
         return FSMStateName::QPSTAND;
     }
-    else{
+    else
+    {
         return FSMStateName::PDSTAND;
     }
 }

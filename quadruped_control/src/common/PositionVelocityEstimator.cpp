@@ -1,4 +1,4 @@
-#include "../../include/common/PositionVelocityEstimator.h"
+#include <common/PositionVelocityEstimator.h>
 
 void LinearKFPositionVelocityEstimator::setup() {
   double dt = 0.001;
@@ -87,7 +87,7 @@ void LinearKFPositionVelocityEstimator::run() {
     //std::cout << "loop: " << i << std::endl;
     //std::cout << "find hip location" << std::endl;
      Quadruped& quadruped =
-        *(this->_stateEstimatorData.legControllerData->aliengo);
+        *(this->_stateEstimatorData.legControllerData->quadptr);
 
     //std::cout << "dynamics defined" << std::endl;
     Vec3<double> ph = quadruped.getHipLocation(i);  // hip positions relative to CoM
@@ -131,12 +131,6 @@ void LinearKFPositionVelocityEstimator::run() {
     _vs.segment(i1, 3) = (1.0f - trust) * v0 + trust * (-dp_f);
     pzs(i) = (1.0f - trust) * (p0(2) + p_f(2));
   }
-  // std::cout << "_ps: " << std::endl;
-  // std::cout << _ps << std::endl;
-  // std::cout << "_vs: " << std::endl;
-  // std::cout << _vs << std::endl;
-  // std::cout << "pzs: " << std::endl;
-  // std::cout << pzs << std::endl;
 
   Eigen::Matrix<double, 28, 1> y;
   y << _ps, _vs, pzs;
@@ -267,7 +261,6 @@ void TunedKFPositionVelocityEstimator::setup() {
 }
 
 void TunedKFPositionVelocityEstimator::run() {
-  //std::cout << "run LinearKFPosVelEstimate" << std::endl;
   _Q = _QInit;
   _R = _RInit;
 
@@ -275,8 +268,6 @@ void TunedKFPositionVelocityEstimator::run() {
   int rindex1 = 0;
   int rindex2 = 0;
   int rindex3 = 0;
-
-  // std::cout << "a_x " << this->_stateEstimatorData.result->aWorld << std::endl;
 
   Vec3<double> g(0, 0, -9.81);
   Mat3<double> Rbod = this->_stateEstimatorData.result->rBody.transpose();
@@ -290,15 +281,11 @@ void TunedKFPositionVelocityEstimator::run() {
 
   for (int i = 0; i < 4; i++) {
     int i1 = 3 * i;
-    //std::cout << "loop: " << i << std::endl;
-    //std::cout << "find hip location" << std::endl;
      Quadruped& quadruped =
-        *(this->_stateEstimatorData.legControllerData->aliengo);
+        *(this->_stateEstimatorData.legControllerData->quadptr);
 
     //std::cout << "dynamics defined" << std::endl;
     Vec3<double> ph = quadruped.getHipLocation(i);  // hip positions relative to CoM
-
-    //std::cout << ph << std::endl;
 
     Vec3<double> p_rel = ph + this->_stateEstimatorData.legControllerData[i].p;
     Vec3<double> dp_rel = this->_stateEstimatorData.legControllerData[i].v; 
@@ -337,12 +324,6 @@ void TunedKFPositionVelocityEstimator::run() {
     _vs.segment(i1, 3) = (1.0f - trust) * v0 + trust * (-dp_f);
     pzs(i) = (1.0f - trust) * (p0(2) + p_f(2));
   }
-  // std::cout << "_ps: " << std::endl;
-  // std::cout << _ps << std::endl;
-  // std::cout << "_vs: " << std::endl;
-  // std::cout << _vs << std::endl;
-  // std::cout << "pzs: " << std::endl;
-  // std::cout << pzs << std::endl;
 
   Eigen::Matrix<double, 28, 1> y;
   y << _ps, _vs, pzs;
@@ -357,11 +338,6 @@ void TunedKFPositionVelocityEstimator::run() {
   // todo compute LU only once
   Eigen::Matrix<double, 28, 1> S_ey = S.lu().solve(ey);
   _xhat += Pm * Ct * S_ey;
-
-  //   std::cout << "_A: " << std::endl;
-  // std::cout << _A << std::endl;
-  // std::cout << "Pm: " << std::endl;
-  // std::cout << Pm << std::endl;
 
 
   Eigen::Matrix<double, 28, 18> S_C = S.lu().solve(_C);

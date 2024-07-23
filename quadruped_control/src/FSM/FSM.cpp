@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSM.h"
+#include <FSM/FSM.h>
 #include <iostream>
 
 FSM::FSM(ControlFSMData *data)

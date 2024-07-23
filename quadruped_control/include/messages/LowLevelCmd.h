@@ -1,7 +1,7 @@
 #ifndef LOWLEVELCMD_H
 #define LOWLEVELCMD_H
 
-#include "../common/cppTypes.h"
+#include <common/cppTypes.h>
 
 struct MotorCmd{
     unsigned int mode;

@@ -2,7 +2,7 @@
 #define WALKING_H
 
 #include "FSMState.h"
-#include "../../ConvexMPC/NominalMPC.h"
+#include <ConvexMPC/NominalMPC.h>
 
 class FSMState_Walking: public FSMState
 {

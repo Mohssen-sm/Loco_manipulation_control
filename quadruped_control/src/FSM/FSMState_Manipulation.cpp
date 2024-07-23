@@ -1,8 +1,8 @@
-#include "../../include/FSM/FSMState_Manipulation.h"
+#include <FSM/FSMState_Manipulation.h>
 
 FSMState_Manipulation::FSMState_Manipulation(ControlFSMData *data)
     : FSMState(data, FSMStateName::MANIPULATION, "manipulation"),
-      Cmpc(0.001, 50, 10) {}
+      Cmpc(0.001, 10, data->_quadruped) {}
 
 template <typename T0, typename T1, typename T2>
 T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim = -1, const double maxLim = 1)
@@ -12,14 +12,11 @@ T1 invNormalize(const T0 value, const T1 min, const T2 max, const double minLim 
 
 void FSMState_Manipulation::enter()
 {
-    // v_des_body << 0, 0, 0;
     pitch = 0;
     roll = 0;
-    //  _data->_interface->zeroCmdPanel();
     counter = 0;
     Cmpc.firstRun = true;
     _data->_stateEstimator->run();
-    // _data->_legController->zeroCommand();
 }
 
 void FSMState_Manipulation::run()

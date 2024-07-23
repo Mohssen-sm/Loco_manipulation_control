@@ -9,7 +9,7 @@
 #include "FSMState_ThreeFoot.h"
 #include "FSMState_Climb.h"
 #include "FSMState_Manipulation.h"
-#include "../common/enumClass.h"
+#include <common/enumClass.h>
 
 struct FSMStateList{
     FSMState *invalid;

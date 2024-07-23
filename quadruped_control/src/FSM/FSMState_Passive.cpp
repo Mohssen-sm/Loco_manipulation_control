@@ -1,4 +1,4 @@
-#include "../../include/FSM/FSMState_Passive.h"
+#include <FSM/FSMState_Passive.h>
 
 FSMState_Passive::FSMState_Passive(ControlFSMData *data):
                   FSMState(data, FSMStateName::PASSIVE, "passive"){}

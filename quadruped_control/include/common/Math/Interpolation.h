@@ -8,7 +8,7 @@
 
 #include <assert.h>
 #include <type_traits>
-#include "../cppTypes.h"
+#include <common/cppTypes.h>
 
 namespace Interpolate {
 

@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 project(quadruped_control)
-set(CMAKE_CXX_STANDARD 14)
-include_directories(${CMAKE_BINARY_DIR})
-set(CMAKE_C_FLAGS "-O3  -ggdb  -march=native -std=gnu99 -I.")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "-lboost_system -fext-numeric-literals -O3") 
-add_definitions(-DEIGEN_STACK_ALLOCATION_LIMIT=0)
-find_package(catkin REQUIRED COMPONENTS
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+find_package(catkin REQUIRED 
+    COMPONENTS
     controller_manager
     genmsg
     joint_state_controller
@@ -17,22 +15,34 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     tf
     geometry_msgs
-    unitree_legged_msgs  
+    unitree_legged_msgs 
+    qpoases_catkin 
 )
 find_package(gazebo REQUIRED)
-find_package(Boost REQUIRED)
-#find_package(qpoases)
+
+find_package(Boost REQUIRED COMPONENTS
+        system
+        filesystem
+        )
+
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
 catkin_package(
+    INCLUDE_DIRS
+    include
+    LIBRARIES
+    ${PROJECT_NAME}
     CATKIN_DEPENDS 
     unitree_legged_msgs 
+    qpoases_catkin
 )
 
 include_directories(
-    # include
+    include
     ${Boost_INCLUDE_DIR}
+    ${EIGEN3_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
-    #${GAZEBO_LIBRARY_DIRS}
 )
 
 link_directories(
@@ -40,21 +50,21 @@ link_directories(
     ${GAZEBO_LIBRARY_DIRS}
 )
 
-add_subdirectory(third_party/qpOASES)
-
 file(GLOB_RECURSE SRC_LIST
 "src/*/*.cpp"
-"src/*/*.cc"
-"BalanceController/*.cpp"
-"ConvexMPC/*.cpp"
 )
-add_executable(quad_control src/main.cpp  ${SRC_LIST} )
-target_link_libraries(quad_control ${catkin_LIBRARIES} qpOASES -pthread lcm)
 
-add_executable(aliengo_ctrl src/aliengo_ctrl.cpp  ${SRC_LIST} )
-target_link_libraries(aliengo_ctrl ${catkin_LIBRARIES} qpOASES -pthread lcm)
+add_library(${PROJECT_NAME}
+    ${SRC_LIST}
+        )
 
-add_executable(a1_ctrl src/a1_ctrl.cpp  ${SRC_LIST} )
-target_link_libraries(a1_ctrl ${catkin_LIBRARIES} qpOASES -pthread lcm)
+target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )        
+
+# quad_control node
+add_executable(quad_control src/quad_control.cpp)
+add_dependencies(quad_control ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(quad_control ${PROJECT_NAME} ${catkin_LIBRARIES} -pthread lcm)
 
 

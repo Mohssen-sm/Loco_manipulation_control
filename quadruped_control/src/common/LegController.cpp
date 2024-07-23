@@ -1,4 +1,4 @@
-#include "../../include/common/LegController.h"
+#include <common/LegController.h>
 
 // upper level of joint controller 
 // send data to joint controller
@@ -52,11 +52,8 @@ void LegController::updateData(const LowlevelState* state){
 void LegController::updateCommand(LowlevelCmd* cmd){
 
     for (int i = 0; i <4; i++){
-        // tauFF
-        //commands[i].tau = Vec3<double>::Zero();
+
         Vec3<double> legTorque = commands[i].tau;
-        //std::cout << "commmand" << commands[i].tau << std::endl;
-        // forceFF
 
         Vec3<double> footForce = commands[i].feedforwardForce;
         if(commands[i].kpCartesian(0,0) != 0 || commands[i].kdCartesian(0,0) != 0)
@@ -88,7 +85,6 @@ void LegController::updateCommand(LowlevelCmd* cmd){
         }
         commands[i].tau << 0, 0, 0; // zero torque command to prevent interference
     }
-    //std::cout << "cmd sent" << std::endl;
    
 }
 

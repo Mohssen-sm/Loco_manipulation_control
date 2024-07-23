@@ -1,4 +1,4 @@
-#include "../../include/common/OrientationEstimator.h"
+#include <common/OrientationEstimator.h>
 
 /*!
  * Get quaternion, rotation matrix, angular velocity (body and world),

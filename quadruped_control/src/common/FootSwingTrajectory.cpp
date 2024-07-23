@@ -5,8 +5,8 @@
  * Currently uses Bezier curves like Cheetah 3 does
  */
 
-#include "../../include/common/Math/Interpolation.h"
-#include "../../include/common/FootSwingTrajectory.h"
+#include <common/Math/Interpolation.h>
+#include <common/FootSwingTrajectory.h>
 
 /*!
  * Compute foot swing trajectory with a bezier curve
