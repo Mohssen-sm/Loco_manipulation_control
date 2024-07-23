@@ -74,7 +74,7 @@ void MPCSolver::set_manipulation_force(float *force)
     manipulation_force[i] = force[i];
 }
 void MPCSolver::update_problem_data(double *p, double *v, double *q, double *w, double *r, double yaw, double *weights,
-                                    double *state_trajectory, double alpha, int *gait, int robot_type)
+                                    double *state_trajectory, double alpha, int *gait)
 {
   mfp_to_flt(update.p, p, 3);
   mfp_to_flt(update.v, v, 3);
@@ -82,7 +82,6 @@ void MPCSolver::update_problem_data(double *p, double *v, double *q, double *w, 
   mfp_to_flt(update.w, w, 3);
   mfp_to_flt(update.r, r, 12);
   update.yaw = yaw;
-  update.robot_type = robot_type;
   mfp_to_flt(update.weights, weights, 12);
   // this is safe, the solver isn't running, and update_problem_data and setup_problem
   // are called from the same thread

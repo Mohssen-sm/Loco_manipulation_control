@@ -11,27 +11,25 @@ LocoManipulationMPC::LocoManipulationMPC(double _dt, int horizon, Quadruped *qua
 {
   solver.setup_LocoManipulation(horizonLength, 15);
 
-  *Q = (8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2);
   if (quad->robot_index == 1)
   {
     //  Q[12] = {25, 20, 15, 1.0, 1.0, 32, 0.0, 0.0, 0.3, 0.2, 0.2, 0.2}; // weight for aliengo
-    *Q = (8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2);
+    Q << 8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2;
   }
   else if (quad->robot_index == 2)
   {
-    *Q = (0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4);
+    Q << 0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4;
   }
   else if (quad->robot_index == 3)
   {
-    *Q = (0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4);
+    Q << 0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4;
   }
   footSwingHeight = 0.08;
-  
 }
 
 void LocoManipulationMPC::run(ControlFSMData &data)
 {
-  auto &seResult = data._stateEstimator->getResult();
+  auto seResult = data._stateEstimator->getResult();
   auto &stateCommand = data._desiredStateCommand;
 
   // pick gait
@@ -146,7 +144,7 @@ void LocoManipulationMPC::run(ControlFSMData &data)
     Vec3<double> pYawCorrected = coordinateRotation(CoordinateAxis::Z, -stateCommand->data.stateDes[11] * gait->_stance * dtMPC / 2) * pRobotFrame;
 
     Pf = seResult.position +
-                      seResult.rBody.transpose() * pYawCorrected + seResult.vWorld * swingTimeRemaining[i];
+         seResult.rBody.transpose() * pYawCorrected + seResult.vWorld * swingTimeRemaining[i];
 
     double p_rel_max = 0.2;
     double pfx_rel = seResult.vWorld[0] * .5 * gait->_stance * dtMPC +
@@ -228,82 +226,32 @@ void LocoManipulationMPC::run(ControlFSMData &data)
     }
   }
 
-  updateMPCIfNeeded(mpcTable, data);
-
-  iterationCounter++;
-}
-
-void LocoManipulationMPC::updateMPCIfNeeded(int *mpcTable, ControlFSMData &data)
-{
   if ((iterationCounter % 30) == 0)
   {
-    auto seResult = data._stateEstimator->getResult();
-    auto &stateCommand = data._desiredStateCommand;
-
-    double *p = seResult.position.data();
-    double *v = seResult.vWorld.data();
-    double *w = seResult.omegaWorld.data();
-    double *q = seResult.orientation.data();
-
     double r[12];
     for (int i = 0; i < 12; i++)
       r[i] = pFoot[i % 4][i / 4] - seResult.position[i / 4];
 
-    // double Q[12] = {25, 20, 15, 1.0, 1.0, 32, 0.0, 0.0, 0.3, 0.2, 0.2, 0.2}; // weight for aliengo
-    double Q[12] = {8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2};
-
-    if (data._quadruped->robot_index == 2)
-    {
-      *Q = (0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4);
-    }
-    double yaw = seResult.rpy[2];
-    double *weights = Q;
-    double alpha = 4e-5; // make setting eventually
-
-    if (alpha > 1e-4)
-    {
-
-      std::cout << "Alpha was set too high (" << alpha << ") adjust to 1e-5\n";
-      alpha = 1e-5;
-    }
-    Vec3<double> v_des_robot(stateCommand->data.stateDes[6], stateCommand->data.stateDes[7], 0);
-
-    Vec3<double> v_des_world = seResult.rBody.transpose() * v_des_robot;
-
-    const double max_pos_error = .1;
     double xStart = world_position_desired[0];
     double yStart = world_position_desired[1];
 
-    if (xStart - p[0] > max_pos_error)
-      xStart = p[0] + max_pos_error;
-    if (p[0] - xStart > max_pos_error)
-      xStart = p[0] - max_pos_error;
+    if (xStart - seResult.position(0) > 0.1)
+      xStart = seResult.position(0) + 0.1;
+    if (seResult.position(0) - xStart > 0.1)
+      xStart = seResult.position(0) - 0.1;
 
-    if (yStart - p[1] > max_pos_error)
-      yStart = p[1] + max_pos_error;
-    if (p[1] - yStart > max_pos_error)
-      yStart = p[1] - max_pos_error;
+    if (yStart - seResult.position(1) > 0.1)
+      yStart = seResult.position(1) + 0.1;
+    if (seResult.position(1) - yStart > 0.1)
+      yStart = seResult.position(1) - 0.1;
 
     world_position_desired[0] = xStart;
     world_position_desired[1] = yStart;
 
-    double trajInitial[12] = {                                              // stateCommand->data.stateDes[3],
-                              rpy_comp[0] + stateCommand->data.stateDes[3], // 0
-                              rpy_comp[1] + stateCommand->data.stateDes[4], // 1
-                              stateCommand->data.stateDes[5],               // 2
-                              xStart,                                       // 3
-                              yStart,                                       // 4
-                              0.3,                                          // 5
-                              0,                                            // 6
-                              0,                                            // 7
-                              stateCommand->data.stateDes[11],              // 8
-                              v_des_world[0],                               // 9
-                              v_des_world[1],                               // 10
-                              v_des_world[2]};                              // 11
-    if (data._quadruped->robot_index == 1)
-    {
-      trajInitial[5] = 0.35;
-    }
+    double trajInitial[12] = {0, 0, stateCommand->data.stateDes[5],
+                              world_position_desired[0], world_position_desired[1], world_position_desired[2],
+                              0, 0, stateCommand->data.stateDes[11],
+                              v_des_world[0], v_des_world[1], v_des_world[2]};
     if (climb)
     {
       trajInitial[1] += ground_pitch;
@@ -321,22 +269,21 @@ void LocoManipulationMPC::updateMPCIfNeeded(int *mpcTable, ControlFSMData &data)
       }
     }
 
-    Timer t1;
-    t1.start();
-    dtMPC = dt * iterationsBetweenMPC;
-    Timer t2;
-    t2.start();
     solver.set_manipulation_force(data._lowState->userValue.manipulation_force);
-    solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable, data._quadruped->robot_index);
+
+    solver.update_problem_data(seResult.position.data(), seResult.vWorld.data(), seResult.orientation.data(),
+     seResult.omegaWorld.data(), r, seResult.rpy[2], Q.data(), trajAll, alpha, mpcTable);
 
     for (int leg = 0; leg < 4; leg++)
     {
       Vec3<double> f;
       for (int axis = 0; axis < 3; axis++)
+      {
         f[axis] = solver.get_solution(leg * 3 + axis);
-
-      // f_ff[leg] =  - coordinateRotation(CoordinateAxis::Z, seResult.rpy[2]) * f;
+      }
       f_ff[leg] = -seResult.rBody * f;
     }
   }
+
+  iterationCounter++;
 }

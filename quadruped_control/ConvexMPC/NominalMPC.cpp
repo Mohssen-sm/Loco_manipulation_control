@@ -348,7 +348,7 @@ void NominalMPC::updateMPCIfNeeded(int *mpcTable, ControlFSMData &data)
     dtMPC = dt * iterationsBetweenMPC;
     Timer t2;
     t2.start();
-    solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable, data._quadruped->robot_index);
+    solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable);
 
     for (int leg = 0; leg < 4; leg++)
     {

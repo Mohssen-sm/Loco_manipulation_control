@@ -40,7 +40,6 @@ struct update_data_t
   float angular_accel[3];
   float yaw;
   float weights[12];
-  float robot_type; // 1 for A1, 2 for Aliengo
   float traj[12 * K_MAX_GAIT_SEGMENTS];
   float alpha;
   unsigned char gait[K_MAX_GAIT_SEGMENTS];
@@ -58,7 +57,7 @@ public:
   void setup_adaptive(int horizon, int _state_num, float *_mu_2);
   void setup_LocoManipulation(int horizon, int _state_num);
   void update_problem_data(double *p, double *v, double *q, double *w, double *r, double yaw, double *weights, double *state_trajectory,
-                           double alpha, int *gait, int robot_type);
+                           double alpha, int *gait);
   void set_acclerations(double *_ang_accel, double *_lin_accel);
   void set_manipulation_force(float *force);
   double get_solution(int index);

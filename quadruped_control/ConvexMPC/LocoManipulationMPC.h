@@ -9,10 +9,8 @@ class LocoManipulationMPC : public MPCLocomotion
 public:
   LocoManipulationMPC(double _dt, int horizon, Quadruped *quad);
   void run(ControlFSMData &data);
-  void updateMPCIfNeeded(int *mpcTable, ControlFSMData &data);
 
   MPCSolver solver;
-  float manipulation_force[3] = {0, 0, 0};
 };
 
 #endif

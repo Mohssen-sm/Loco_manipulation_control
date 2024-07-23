@@ -361,7 +361,7 @@ void StairMPC::updateMPCIfNeeded(int *mpcTable, ControlFSMData &data)
     dtMPC = dt * iterationsBetweenMPC;
     Timer t2;
     t2.start();
-    solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable, data._quadruped->robot_index);
+    solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable);
 
     // t2.stopPrint("Run MPC");
     //  printf("MPC Solve time %f ms\n", t2.getMs());

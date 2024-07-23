@@ -63,9 +63,10 @@ protected:
   Vec3<double> v_des_robot;
   Vec3<double> v_des_world;
   Vec3<double> v_robot;
-  double Q[12];
   double footSwingHeight = 0.1;
   Vec3<double> Pf;
+  double alpha;
+  Eigen::VectorXd Q;
 };
 
 #endif
