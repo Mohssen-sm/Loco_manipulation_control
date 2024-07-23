@@ -14,11 +14,12 @@
 #include <tf/transform_broadcaster.h>
 #include <gazebo_msgs/ModelStates.h>
 #include <string>
+#include <common/Quadruped.h>
 
 class IOROS : public IOInterface
 {
     public:
-        IOROS();
+        IOROS(Quadruped quad);
         ~IOROS();
         void sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
 
@@ -33,6 +34,7 @@ class IOROS : public IOInterface
         std::string _robot_name;
         float _camera_link_length;
         HighlevelCmd Highcmd;
+        Quadruped _quad;
         
         ros::Time _currentTime;
         std::string tf_prefix;

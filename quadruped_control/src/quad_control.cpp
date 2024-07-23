@@ -43,12 +43,12 @@ int main(int argc, char **argv)
 
     ros::init(argc, argv, robot_name + "_control");
 
-    IOInterface *ioInter;
-    ioInter = new IOROS();
-    ros::Rate rate(1000);
-
     double dt = 0.001;
     Quadruped quad(robot_name);
+    
+    IOInterface *ioInter;
+    ioInter = new IOROS(quad);
+    ros::Rate rate(1000);
 
     LegController *legController = new LegController(quad);
     LowlevelCmd *cmd = new LowlevelCmd();

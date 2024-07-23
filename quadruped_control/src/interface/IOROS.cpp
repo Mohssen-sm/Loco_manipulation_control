@@ -10,7 +10,7 @@ inline void RosShutDown(int sig)
     ros::shutdown();
 }
 
-IOROS::IOROS() : IOInterface()
+IOROS::IOROS(Quadruped quad) : IOInterface(), _quad(quad)
 {
     // start subscriber
     initRecv();
@@ -368,7 +368,7 @@ void IOROS::poseCallback(const geometry_msgs::Pose &msg)
     Eigen::Vector3d contact_point_world = (Eigen::Vector3d() << msg.position.x, msg.position.y, 0).finished();
     Eigen::Vector3d distance_body = rotmat.transpose() * (contact_point_world - pose_world);
 
-    Highcmd.velocity_cmd[0] = 2 * (distance_body[0] - 0.25);        // 0.32 is the head to COM distance - magic number
+    Highcmd.velocity_cmd[0] = 2 * (distance_body[0] - _quad.leg_offset_x);  
     Highcmd.velocity_cmd[1] = cmd_body[1] + 3 * (distance_body[1]); // magic number
     //   ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
 }
