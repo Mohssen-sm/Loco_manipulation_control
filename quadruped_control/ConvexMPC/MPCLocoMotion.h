@@ -47,7 +47,6 @@ protected:
   double swingTimeRemaining[4];
   double stand_traj[6];
   double foothold_offset[8];
-  int current_gait;
   int gaitNumber;
 
   Vec3<double> world_position_desired;
@@ -60,6 +59,13 @@ protected:
   Vec3<double> a; // a = [a_0, a_1, a_2]; z(x,y) = a_0 + a_1x + a_2y
   Vec4<double> pz;
   double ground_pitch;
+
+  Vec3<double> v_des_robot;
+  Vec3<double> v_des_world;
+  Vec3<double> v_robot;
+  double Q[12];
+  double footSwingHeight = 0.1;
+  Vec3<double> Pf;
 };
 
 #endif

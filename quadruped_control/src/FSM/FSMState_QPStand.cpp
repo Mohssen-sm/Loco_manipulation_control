@@ -37,6 +37,7 @@ void FSMState_QPStand::enter()
         p_des[i] = _data->_stateEstimator->getResult().position(i);
         rpy[i] = 0;
     }
+    p_des[2] = _data->_quadruped->COM_height;
     rpy[2] = init_yaw;
 
     if (_data->_quadruped->robot_index == 1)
@@ -52,7 +53,6 @@ void FSMState_QPStand::enter()
         kpCOM[2] = 60;
         kpBase[0] = 800;
         kpBase[1] = 750;
-        p_des[2] = 0.4;
     }
     else if (_data->_quadruped->robot_index == 2)
     {
@@ -65,7 +65,6 @@ void FSMState_QPStand::enter()
         }
 
         kpCOM[2] = 40;
-        p_des[2] = 0.3;
     }
 
     else if (_data->_quadruped->robot_index == 3)
@@ -82,7 +81,6 @@ void FSMState_QPStand::enter()
         kpBase[0] = 600;
         kpBase[1] = 500;
         kpBase[2] = 200;
-        p_des[2] = 0.3;
     }
     else
     {

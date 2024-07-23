@@ -33,6 +33,7 @@ public:
         { // Aliengo
             mass = 19;
             Ig << 0.050874, 0.64036, 0.65655;
+            COM_height = 0.4;
 
             leg_offset_x = 0.2399;
             leg_offset_y = 0.051;
@@ -41,12 +42,14 @@ public:
             hipLinkLength = 0.0838;
             thighLinkLength = 0.25;
             calfLinkLength = 0.25;
+
             gait_iteration = 50;
         }
         else if (robot_index == 2)
         { // A1
             mass = 12;
             Ig << 0.0168, 0.0565, 0.064;
+            COM_height = 0.3;
 
             leg_offset_x = 0.1805;
             leg_offset_y = 0.047;
@@ -55,12 +58,14 @@ public:
             hipLinkLength = 0.0838; // hip offset in const.xacro
             thighLinkLength = 0.2;
             calfLinkLength = 0.2;
+
             gait_iteration = 30;
         }
         else if (robot_index == 3)
         { // Go1
             mass = 12.84;
             Ig << 0.0792, 0.2085, 0.2265;
+            COM_height = 0.3;
 
             leg_offset_x = 0.1881;
             leg_offset_y = 0.04675;
@@ -69,6 +74,7 @@ public:
             hipLinkLength = 0.08; // hip offset in const.xacro
             thighLinkLength = 0.213;
             calfLinkLength = 0.213;
+
             gait_iteration = 30;
         }
     }
@@ -82,6 +88,7 @@ public:
     double mass;
     Vec3<double> Ig;
     int gait_iteration;
+    double COM_height;
 
     Vec3<double> getHipLocation(int leg)
     {

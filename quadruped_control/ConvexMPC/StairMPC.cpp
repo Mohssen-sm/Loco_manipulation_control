@@ -36,8 +36,6 @@ void StairMPC::run(ControlFSMData &data)
   else if (gaitNumber == 9)
     gait = &static_walking;
 
-  current_gait = gaitNumber;
-
   for (int i = 0; i < 4; i++)
   {
     pFoot[i] = seResult.position + seResult.rBody.transpose() * (data._quadruped->getHipLocation(i) + data._legController->data[i].p);
