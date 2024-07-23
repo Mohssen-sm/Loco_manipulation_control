@@ -8,7 +8,7 @@
 #include <cmath>
 #include <sys/time.h>
 #include "common_types.h"
-#include "../third_party/qpOASES/include/qpOASES.hpp"
+#include <qpOASES.hpp>
 #include "../include/common/Utilities/Timer.h"
 #include "../include/common/cppTypes.h"
 #include "RobotState.h"
