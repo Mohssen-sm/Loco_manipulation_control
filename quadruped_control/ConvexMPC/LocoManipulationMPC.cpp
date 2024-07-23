@@ -11,20 +11,25 @@ LocoManipulationMPC::LocoManipulationMPC(double _dt, int horizon, Quadruped *qua
 {
   solver.setup_LocoManipulation(horizonLength, 15);
 
-  if (quad->robot_index == 1)
+  if (quad->robot_index == 1) // aliengo
   {
-    //  Q[12] = {25, 20, 15, 1.0, 1.0, 32, 0.0, 0.0, 0.3, 0.2, 0.2, 0.2}; // weight for aliengo
-    Q << 8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    // Q << 8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    Q << 15.0, 12.0, 10, 1.5, 1.5, 60, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    footSwingHeight = 0.12;
+    KpJoint << 80, 80, 80;
+    MPCUpdateLoop = 30;
   }
-  else if (quad->robot_index == 2)
+  else if (quad->robot_index == 2) // a1
   {
     Q << 0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4;
   }
-  else if (quad->robot_index == 3)
+  else if (quad->robot_index == 3) // go1
   {
-    Q << 0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4;
+    Q << 15.0, 12.0, 10, 1.5, 1.5, 35, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    footSwingHeight = 0.1;
+    KpJoint << 40, 40, 40;
+    MPCUpdateLoop = 30;
   }
-  footSwingHeight = 0.08;
 }
 
 void LocoManipulationMPC::run(ControlFSMData &data)
@@ -196,8 +201,8 @@ void LocoManipulationMPC::run(ControlFSMData &data)
       data._legController->commands[foot].pDes = pDesLeg;
       data._legController->commands[foot].vDes = vDesLeg;
 
-      data._legController->commands[foot].kpJoint.diagonal() << 40, 40, 40;
-      data._legController->commands[foot].kdJoint.diagonal() << 1, 1, 1;
+      data._legController->commands[foot].kpJoint.diagonal() = KpJoint;
+      data._legController->commands[foot].kdJoint.diagonal() << 2, 2, 2;
       // account for early contact
       if (data._stateEstimator->getResult().contactEstimate(foot) != 0)
       {
@@ -214,7 +219,7 @@ void LocoManipulationMPC::run(ControlFSMData &data)
       Vec3<double> vDesLeg = seResult.rBody * (vDesFootWorld - seResult.vWorld);
 
       data._legController->commands[foot].kpJoint.diagonal() << 0, 0, 0;
-      data._legController->commands[foot].kdJoint.diagonal() << 1, 1, 1;
+      data._legController->commands[foot].kdJoint.diagonal() << 0.5, 0.5, 0.5;
 
       data._legController->commands[foot].feedforwardForce = f_ff[foot];
 
@@ -226,7 +231,7 @@ void LocoManipulationMPC::run(ControlFSMData &data)
     }
   }
 
-  if ((iterationCounter % 30) == 0)
+  if ((iterationCounter % MPCUpdateLoop) == 0)
   {
     double r[12];
     for (int i = 0; i < 12; i++)
@@ -248,7 +253,7 @@ void LocoManipulationMPC::run(ControlFSMData &data)
     world_position_desired[0] = xStart;
     world_position_desired[1] = yStart;
 
-    double trajInitial[12] = {0, 0, stateCommand->data.stateDes[5],
+    double trajInitial[12] = {rpy_comp[0] + stateCommand->data.stateDes[3], rpy_comp[1] + stateCommand->data.stateDes[4], stateCommand->data.stateDes[5],
                               world_position_desired[0], world_position_desired[1], world_position_desired[2],
                               0, 0, stateCommand->data.stateDes[11],
                               v_des_world[0], v_des_world[1], v_des_world[2]};

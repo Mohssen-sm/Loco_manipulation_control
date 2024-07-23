@@ -24,8 +24,8 @@ class FSMState_QPStand: public FSMState
         double minForces[4];
         double maxForces[4];
         double contactStateScheduled[4] = {1, 1, 1, 1}; //assume 4-leg standing
-        double COM_weights_stance[3] = {5, 5, 15};
-        double Base_weights_stance[3] = {10, 10, 20};
+        double COM_weights_stance[3] = {5, 5, 5};
+        double Base_weights_stance[3] = {40, 20, 10};
         double pFeet[12], p_act[3], v_act[3], O_err[3], rpy[3],v_des[3], p_des[3],
                omegaDes[3];
         double se_xfb[13];

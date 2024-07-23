@@ -44,27 +44,29 @@ void FSMState_QPStand::enter()
     {
         for (int i = 0; i < 3; i++)
         {
-            kpCOM[i] = 40;
-            kdCOM[i] = 20;
+            kpCOM[i] = 30;
+            kdCOM[i] = 10;
             kpBase[i] = 100;
-            kdBase[i] = 35;
+            kdBase[i] = 20;
         }
 
-        kpCOM[2] = 60;
-        kpBase[0] = 800;
-        kpBase[1] = 750;
+        kpCOM[2] = 95;
+        kpBase[0] = 600;
+        kpBase[1] = 450;
     }
     else if (_data->_quadruped->robot_index == 2)
     {
         for (int i = 0; i < 3; i++)
         {
-            kpCOM[i] = 30;
-            kdCOM[i] = 5;
-            kpBase[i] = 80;
+            kpCOM[i] = 40;
+            kdCOM[i] = 20;
+            kpBase[i] = 200;
             kdBase[i] = 20;
         }
 
-        kpCOM[2] = 40;
+        kpCOM[2] = 65;
+        kpBase[0] = 600;
+        kpBase[1] = 500;
     }
 
     else if (_data->_quadruped->robot_index == 3)
@@ -81,6 +83,11 @@ void FSMState_QPStand::enter()
         kpBase[0] = 600;
         kpBase[1] = 500;
         kpBase[2] = 200;
+        COM_weights_stance[2] = 15;
+        Base_weights_stance[0] = 10;
+        Base_weights_stance[1] = 10;
+        Base_weights_stance[2] = 20;
+
     }
     else
     {
@@ -128,7 +135,6 @@ void FSMState_QPStand::run()
         pFeet[leg * 3] = pFeetVecCOM[0];
         pFeet[leg * 3 + 1] = pFeetVecCOM[1];
         pFeet[leg * 3 + 2] = pFeetVecCOM[2];
-        // std::cout << "pFeet" << leg << std::endl;
     }
 
     rpy[0] = (double)invNormalize(_userValue.lx, _rollMin, _rollMax);
@@ -156,7 +162,7 @@ void FSMState_QPStand::run()
             fOpt[leg * 3 + 2]; // force in world frame, need to convert to body frame
 
         _data->_legController->commands[leg].feedforwardForce = footFeedForwardForces.col(leg);
-        // _data->_legController->commands[leg].kpJoint.diagonal() << 0.5, 0.5, 0.5;
+        _data->_legController->commands[leg].kdJoint.diagonal() << 1, 1 ,1;
     }
 
     _data->_legController->updateCommand(_data->_lowCmd);

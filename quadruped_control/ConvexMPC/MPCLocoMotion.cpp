@@ -24,4 +24,6 @@ MPCLocomotion::MPCLocomotion(double _dt, int horizon, Quadruped *quad) : horizon
 
   Q.resize(12);
   Q.setZero();
+  KpJoint << 40, 40, 40;
+  MPCUpdateLoop = 30;
 }

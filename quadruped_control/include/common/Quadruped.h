@@ -31,8 +31,8 @@ public:
     {
         if (robot_index == 1)
         { // Aliengo
-            mass = 19;
-            Ig << 0.050874, 0.64036, 0.65655;
+            mass = 20;
+            Ig << 0.0875, 1.293, 1.338;
             COM_height = 0.4;
 
             leg_offset_x = 0.2399;

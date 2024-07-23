@@ -67,6 +67,8 @@ protected:
   Vec3<double> Pf;
   double alpha;
   Eigen::VectorXd Q;
+  Vec3<double> KpJoint;
+  int MPCUpdateLoop;
 };
 
 #endif
