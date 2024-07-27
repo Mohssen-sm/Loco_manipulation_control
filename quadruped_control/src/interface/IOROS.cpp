@@ -114,7 +114,7 @@ void IOROS::recvState(LowlevelState *state)
     _currentTime = ros::Time::now();
 
     _trunkTF.header.stamp = _currentTime;
-    _trunkTF.header.frame_id = "world"; 
+    _trunkTF.header.frame_id = "world";
     _trunkTF.child_frame_id = tf_prefix + "/" + "base";
 
     _trunkTF.transform.translation.x = _lowState.position.x;
@@ -356,7 +356,7 @@ void IOROS::ManiForceCallback(const geometry_msgs::Wrench &msg)
 void IOROS::cmdvelCallback(const geometry_msgs::Twist &msg)
 {
     cmd_body << msg.linear.x, msg.linear.y, 0.0;
-    Highcmd.omega_cmd[2] = msg.angular.z;
+    omega_z = msg.angular.z;
     msg_received = true;
 }
 
@@ -369,7 +369,25 @@ void IOROS::poseCallback(const geometry_msgs::Pose &msg)
     Eigen::Vector3d distance_body = rotmat.transpose() * (contact_point_world - pose_world);
 
     Highcmd.velocity_cmd[0] = 2 * (distance_body[0] - _quad.leg_offset_x);  
-    Highcmd.velocity_cmd[1] = cmd_body[1] + 3 * (distance_body[1]); // magic number
+    Highcmd.velocity_cmd[1] = cmd_body[1] + 3 * (distance_body[1]);   // magic number
+
+    Eigen::Quaterniond quat_object(msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z);
+    Eigen::Matrix3d rotmat_object = quat_object.toRotationMatrix();
+    Eigen::Vector3d euler_object = rotmat_object.eulerAngles(0, 1, 2);
+    
+    std::cout << "object euler: " << euler_object[0] << " " << euler_object[1] << " " << euler_object[2] << std::endl;
+    std::cout << "robot euler: " << rotmat.eulerAngles(0, 1, 2)[0] << " " << rotmat.eulerAngles(0, 1, 2)[1] << " " << rotmat.eulerAngles(0, 1, 2)[2] << std::endl;
+    double diff;
+    if(euler_object[2] - rotmat.eulerAngles(0,1, 2)[2] < -3.10){
+        diff = euler_object[2] - rotmat.eulerAngles(0,1, 2)[2] + 3.14;
+    }
+    else if(euler_object[2] - rotmat.eulerAngles(0,1, 2)[2] > 3.10){
+        diff = euler_object[2] - rotmat.eulerAngles(0,1, 2)[2] - 3.14;
+    }
+    else{
+        diff = euler_object[2] - rotmat.eulerAngles(0,1, 2)[2];
+    }
+    Highcmd.omega_cmd[2] = omega_z + 2 * (diff); // magic number
     //   ROS_INFO("I heard: x =%f, y=%f, z=%f", Highcmd.velocity_cmd[0], Highcmd.velocity_cmd[1], Highcmd.omega_cmd[2]);
 }
 
