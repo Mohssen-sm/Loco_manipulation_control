@@ -1,7 +1,7 @@
 #ifndef IOSDK_H
 #define IOSDK_H
 
-#include "IOInterface.h"
+#include <interface/IOInterface.h>
 #include <sdk/include/unitree_legged_sdk/unitree_legged_sdk.h>
 
 using namespace UNITREE_LEGGED_SDK;

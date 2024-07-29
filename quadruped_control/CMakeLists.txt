@@ -45,7 +45,7 @@ include_directories(
     ${GAZEBO_INCLUDE_DIRS}
 )
 
-message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+# message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "x86_64.*")
   set(ARCH amd64)
 endif()
@@ -59,24 +59,35 @@ link_directories(
 )
 
 file(GLOB_RECURSE SRC_LIST
-"src/BalanceController/*.cpp",
-"src/common/*.cpp",
-"src/ConvexMPC/*.cpp",
-"src/FSM/*.cpp",
+"src/BalanceController/*.cpp"
+"src/common/*.cpp"
+"src/ConvexMPC/*.cpp"
+"src/FSM/*.cpp"
 "src/interface/*.cpp"
 )
 
 add_library(${PROJECT_NAME}
     ${SRC_LIST}
         )
-
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
-        )        
+        ) 
 
+add_library(IOSDK
+        src/sdk/IOSDK.cpp
+        )
+target_link_libraries(${PROJECT_NAME}
+        libunitree_legged_sdk.a
+        )            
+        
 # quad_control node
 add_executable(quad_control src/quad_control.cpp)
 add_dependencies(quad_control ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(quad_control ${PROJECT_NAME} ${catkin_LIBRARIES} -pthread lcm)
+
+# quad_control hardware node
+add_executable(quad_control_hardware src/quad_control_hardware.cpp)
+add_dependencies(quad_control_hardware ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(quad_control_hardware ${PROJECT_NAME} ${catkin_LIBRARIES} -pthread lcm IOSDK)
 
 
