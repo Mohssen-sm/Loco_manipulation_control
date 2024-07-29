@@ -8,9 +8,9 @@
 #include <common/ContactEstimator.h>
 #include <common/OrientationEstimator.h>
 #include <common/PositionVelocityEstimator.h>
-#include <interface/IOROS.h>
-#include <interface/KeyBoard.h>
 #include <FSM/FSM.h>
+
+#include <interface/IOROS.h>
 
 bool running = true;
 

@@ -1,7 +1,6 @@
 #ifndef CMDPANEL_H
 #define CMDPANEL_H
 
-#include <messages/unitree_joystick.h>
 #include <common/enumClass.h>
 #include <sdk/include/unitree_legged_sdk/unitree_legged_sdk.h>
 #include <messages/LowlevelState.h>
