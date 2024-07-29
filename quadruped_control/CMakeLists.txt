@@ -45,13 +45,25 @@ include_directories(
     ${GAZEBO_INCLUDE_DIRS}
 )
 
+message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "x86_64.*")
+  set(ARCH amd64)
+endif()
+if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "aarch64.*")
+  set(ARCH arm64)
+endif()
+
 link_directories(
-    include/sdk/lib
+    include/sdk/lib/cpp/${ARCH}
     ${GAZEBO_LIBRARY_DIRS}
 )
 
 file(GLOB_RECURSE SRC_LIST
-"src/*/*.cpp"
+"src/BalanceController/*.cpp",
+"src/common/*.cpp",
+"src/ConvexMPC/*.cpp",
+"src/FSM/*.cpp",
+"src/interface/*.cpp"
 )
 
 add_library(${PROJECT_NAME}
