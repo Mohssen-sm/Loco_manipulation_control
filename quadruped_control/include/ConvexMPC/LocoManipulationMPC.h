@@ -1,16 +1,14 @@
 #ifndef LocoManipulationMPC_H
 #define LocoManipulationMPC_H
 
-#include <ConvexMPC/MPCLocoMotion.h>
+#include <ConvexMPC/NominalMPC.h>
 #include <ConvexMPC/MPCSolver.h>
 
-class LocoManipulationMPC : public MPCLocomotion
+class LocoManipulationMPC : public NominalMPC
 {
 public:
   LocoManipulationMPC(double _dt, int horizon, Quadruped *quad);
   void run(ControlFSMData &data);
-
-  MPCSolver solver;
 };
 
 #endif
