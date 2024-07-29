@@ -7,11 +7,47 @@ using namespace ori;
 /* =========================== Controller ============================= */
 NominalMPC::NominalMPC(double _dt, int horizon, Quadruped *quad)
     : MPCLocomotion(_dt, horizon, quad),
-      solver(_dt * quad->gait_iteration, horizon, 0.2, 350, quad) {}
+      solver(_dt * quad->gait_iteration, horizon, 0.2, 350, quad)
+{
+  iterationsBetweenMPC = quad->gait_iteration;
+  dtMPC = dt * iterationsBetweenMPC;
+
+  rpy_int[2] = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    firstSwing[i] = true;
+  }
+  alpha = 4e-5;
+
+  Q.resize(12);
+  Q.setZero();
+  KpJoint << 40, 40, 40;
+  MPCUpdateLoop = 30;
+
+  if (quad->robot_index == 1) // aliengo
+  {
+    // Q << 8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    Q << 15.0, 12.0, 10, 1.5, 1.5, 60, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    footSwingHeight = 0.12;
+    KpJoint << 80, 80, 80;
+  }
+  else if (quad->robot_index == 2) // a1
+  {
+    Q << 0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4;
+    footSwingHeight = 0.1;
+    KpJoint << 80, 80, 80;
+  }
+  else if (quad->robot_index == 3) // go1
+  {
+    Q << 15.0, 12.0, 10, 1.5, 1.5, 35, 0, 0, 0.3, 0.2, 0.2, 0.2;
+    footSwingHeight = 0.1;
+    KpJoint << 40, 40, 40;
+  }
+}
 
 void NominalMPC::run(ControlFSMData &data)
 {
-  auto &seResult = data._stateEstimator->getResult();
+  auto seResult = data._stateEstimator->getResult();
   auto &stateCommand = data._desiredStateCommand;
 
   // pick gait
@@ -35,26 +71,22 @@ void NominalMPC::run(ControlFSMData &data)
   else if (gaitNumber == 9)
     gait = &static_walking;
 
-  // integrate position setpoint
-  Vec3<double> v_des_robot(stateCommand->data.stateDes[6], stateCommand->data.stateDes[7], 0);
-  Vec3<double> v_des_world;
-
+  v_des_robot << stateCommand->data.stateDes[6], stateCommand->data.stateDes[7], 0;
   v_des_world = seResult.rBody.transpose() * v_des_robot;
-  Vec3<double> v_robot = seResult.vBody;
+
+  v_robot = seResult.vBody;
 
   world_position_desired[0] += dt * v_des_world[0];
   world_position_desired[1] += dt * v_des_world[1];
-  world_position_desired[2] = 0.4;
+  world_position_desired[2] = data._quadruped->COM_height;
 
   if (fabs(v_robot[0]) > .2) // avoid dividing by zero
   {
-    rpy_int[1] += dt * (stateCommand->data.stateDes[4] /*-hw_i->state_estimator->se_ground_pitch*/ - seResult.rpy[1]) / v_robot[0];
+    rpy_int[1] += dt * (stateCommand->data.stateDes[4] - seResult.rpy[1]) / v_robot[0];
   }
   if (fabs(v_robot[1]) > 0.1)
   {
-    rpy_int[0] += dt * (stateCommand->data.stateDes[3] /*-hw_i->state_estimator->se_ground_pitch*/
-                        - seResult.rpy[0]) /
-                  v_robot[1];
+    rpy_int[0] += dt * (stateCommand->data.stateDes[3] - seResult.rpy[0]) / v_robot[1];
   }
 
   rpy_int[0] = fminf(fmaxf(rpy_int[0], -.25), .25);
@@ -67,12 +99,10 @@ void NominalMPC::run(ControlFSMData &data)
     pFoot[i] = seResult.position + seResult.rBody.transpose() * (data._quadruped->getHipLocation(i) + data._legController->data[i].p);
   }
 
-  // if(iterationCounter % 600 == 0){
   for (int i = 0; i < 4; i++)
   {
     W.row(i) << 1, footSwingTrajectories[i].getInitialPosition()[0], footSwingTrajectories[i].getInitialPosition()[1];
     pz[i] = footSwingTrajectories[i].getInitialPosition()[2];
-    // if(i != 0) W.row(i) << 0, pFoot[i][0], pFoot[i][1];
   }
   a = W.transpose() * W * (W.transpose() * W * W.transpose() * W).inverse() * W.transpose() * pz;
   ground_pitch = acos(-1 / sqrt(a[1] * a[1] + a[2] * a[2] + 1)) - 3.14;
@@ -85,7 +115,6 @@ void NominalMPC::run(ControlFSMData &data)
   {
     ground_pitch = 0;
   }
-  // }
 
   // some first time initialization
   if (firstRun)
@@ -95,18 +124,15 @@ void NominalMPC::run(ControlFSMData &data)
     world_position_desired[1] = seResult.position[1];
     world_position_desired[2] = seResult.position[2];
 
-    Vec3<double> v_des_robot(0, 0, 0); // connect to desired state command later
+    v_des_robot << 0, 0, 0;
+    v_des_world << 0, 0, 0;
 
-    Vec3<double> v_des_world(0, 0, 0); // connect to desired state command later
-
-    Vec3<double> v_robot = seResult.vBody;
     iterationCounter = 0;
     for (int i = 0; i < 4; i++)
     {
       footSwingTrajectories[i].setHeight(0.1);
       footSwingTrajectories[i].setInitialPosition(pFoot[i]);
       footSwingTrajectories[i].setFinalPosition(pFoot[i]);
-      // std::cout << "orig foot pos " << i << pFoot[i] << std::endl;
     }
 
     swingTimes[0] = dtMPC * gait->_swing;
@@ -118,9 +144,6 @@ void NominalMPC::run(ControlFSMData &data)
 
   contact_state = gait->getContactSubPhase();
   double side_sign[4] = {-1, 1, -1, 1};
-  double interleave_y[4] = {-0.08, 0.08, 0.01, -0.01};
-  double interleave_gain = -0.2;
-  double v_abs = std::fabs(seResult.vBody[0]);
   for (int i = 0; i < 4; i++)
   {
 
@@ -132,25 +155,14 @@ void NominalMPC::run(ControlFSMData &data)
     {
       swingTimeRemaining[i] -= dt;
     }
-    // if((swingTimeRemaining[i]*1000)%5 == 0)
-    footSwingTrajectories[i].setHeight(.08);
+    footSwingTrajectories[i].setHeight(footSwingHeight);
     Vec3<double> offset(0.0, side_sign[i] * 0.06, 0);
-    // simple heuristic function
-    // std::cout << "swing time" << swingTimeRemaining[i] << std::endl;
 
     Vec3<double> pRobotFrame = (data._quadruped->getHipLocation(i) + offset);
     Vec3<double> pYawCorrected = coordinateRotation(CoordinateAxis::Z, -stateCommand->data.stateDes[11] * gait->_stance * dtMPC / 2) * pRobotFrame;
 
-    Vec3<double> des_vel;
-
-    des_vel[0] = stateCommand->data.stateDes(6);
-    des_vel[1] = stateCommand->data.stateDes(7);
-    des_vel[2] = stateCommand->data.stateDes(8);
-
-    Vec3<double> Pf = seResult.position +
-                      seResult.rBody.transpose() * pYawCorrected + seResult.vWorld * swingTimeRemaining[i];
-
-    //+ seResult.vWorld * swingTimeRemaining[i];
+    Pf = seResult.position +
+         seResult.rBody.transpose() * pYawCorrected + seResult.vWorld * swingTimeRemaining[i];
 
     double p_rel_max = 0.2;
     double pfx_rel = seResult.vWorld[0] * .5 * gait->_stance * dtMPC +
@@ -163,11 +175,9 @@ void NominalMPC::run(ControlFSMData &data)
     pfy_rel = fminf(fmaxf(pfy_rel, -p_rel_max), p_rel_max);
     Pf[0] += pfx_rel;
     Pf[1] += pfy_rel;
-    // + interleave_y[i] * interleave_gain * v_abs;
     Pf[2] = 0.0;
 
     footSwingTrajectories[i].setFinalPosition(Pf);
-    //}
   }
 
   // calc gait
@@ -179,50 +189,37 @@ void NominalMPC::run(ControlFSMData &data)
   Vec4<double> contactStates = gait->getContactSubPhase();
   Vec4<double> swingStates = gait->getSwingSubPhase();
 
-  Vec3<double> vDesLeg_stand(0, 0, 0);
-
   for (int foot = 0; foot < 4; foot++)
   {
 
     double contactState = contactStates(foot);
     double swingState = swingStates(foot);
 
-    // std::cout << "swing" << foot << ": " << swingState << std::endl;
     if (swingState > 0) // foot is in swing
     {
-
       if (firstSwing[foot])
       {
         firstSwing[foot] = false;
         footSwingTrajectories[foot].setInitialPosition(pFoot[foot]);
       }
-      // std::cout << "swing" << foot << ": " << swingState << std::endl;
       footSwingTrajectories[foot].computeSwingTrajectoryBezier(swingState, swingTimes[foot]);
 
       Vec3<double> pDesFootWorld = footSwingTrajectories[foot].getPosition().cast<double>();
       Vec3<double> vDesFootWorld = footSwingTrajectories[foot].getVelocity().cast<double>();
-      // if(swingState > 0.5)
-      // {
-      //  vDesFootWorld << 0, 0, 0;
-      // }
 
       Vec3<double> pDesLeg = seResult.rBody * (pDesFootWorld - seResult.position) - data._quadruped->getHipLocation(foot);
       Vec3<double> vDesLeg = seResult.rBody * (vDesFootWorld - seResult.vWorld);
-      //    if(swingState > 0.5)
-      //	        vDesLeg<< 0, 0, 0;
+
       data._legController->commands[foot].feedforwardForce << 0, 0, 0;
       data._legController->commands[foot].pDes = pDesLeg;
       data._legController->commands[foot].vDes = vDesLeg;
 
-      // data._legController->commands[foot].kpCartesian = Kp;
-      // data._legController->commands[foot].kdCartesian = Kd;
-      data._legController->commands[foot].kpJoint.diagonal() << 40, 40, 40;
-      data._legController->commands[foot].kdJoint.diagonal() << 1, 1, 1;
+      data._legController->commands[foot].kpJoint.diagonal() = KpJoint;
+      data._legController->commands[foot].kdJoint.diagonal() << 2, 2, 2;
       // account for early contact
       if (data._stateEstimator->getResult().contactEstimate(foot) != 0)
       {
         mpcTable[foot] = 1;
-        //   // data._legController->commands[foot].feedforwardForce <<0, 0, -20;
       }
     }
     else if (contactState > 0 || data._stateEstimator->getResult().contactEstimate(foot) != 0) // foot is in stance
@@ -234,98 +231,45 @@ void NominalMPC::run(ControlFSMData &data)
       Vec3<double> pDesLeg = seResult.rBody * (pDesFootWorld - seResult.position) - data._quadruped->getHipLocation(foot);
       Vec3<double> vDesLeg = seResult.rBody * (vDesFootWorld - seResult.vWorld);
 
-      //  data._legController->commands[foot].kpCartesian = Kp_stance; // 0
-      //  data._legController->commands[foot].kdCartesian = Kd_stance
       data._legController->commands[foot].kpJoint.diagonal() << 0, 0, 0;
-      data._legController->commands[foot].kdJoint.diagonal() << 1, 1, 1;
+      data._legController->commands[foot].kdJoint.diagonal() << 0.5, 0.5, 0.5;
 
       data._legController->commands[foot].feedforwardForce = f_ff[foot];
 
       if (gaitNumber == 8)
       {
-        // std::cout << "two foot gait " << std::endl;
         for (int i = 0; i < 2; i++)
           data._legController->commands[i].vDes << 0, 0, 0;
       }
     }
   }
 
-  updateMPCIfNeeded(mpcTable, data);
-
-  iterationCounter++;
-}
-
-void NominalMPC::updateMPCIfNeeded(int *mpcTable, ControlFSMData &data)
-{
-  if ((iterationCounter % 30) == 0)
+  if ((iterationCounter % MPCUpdateLoop) == 0)
   {
-    auto seResult = data._stateEstimator->getResult();
-    auto &stateCommand = data._desiredStateCommand;
-
-    double *p = seResult.position.data();
-    double *v = seResult.vWorld.data();
-    double *w = seResult.omegaWorld.data();
-    double *q = seResult.orientation.data();
-
     double r[12];
     for (int i = 0; i < 12; i++)
       r[i] = pFoot[i % 4][i / 4] - seResult.position[i / 4];
 
-    // double Q[12] = {25, 20, 15, 1.0, 1.0, 32, 0.0, 0.0, 0.3, 0.2, 0.2, 0.2}; // weight for aliengo
-    double Q[12] = {8.0, 5.0, 10, 1.5, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2};
-
-    if (data._quadruped->robot_index == 2)
-    {
-      *Q = (0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4);
-    }
-    double yaw = seResult.rpy[2];
-    double *weights = Q;
-    double alpha = 4e-5; // make setting eventually
-
-    if (alpha > 1e-4)
-    {
-
-      std::cout << "Alpha was set too high (" << alpha << ") adjust to 1e-5\n";
-      alpha = 1e-5;
-    }
-    Vec3<double> v_des_robot(stateCommand->data.stateDes[6], stateCommand->data.stateDes[7], 0);
-  
-    Vec3<double> v_des_world = seResult.rBody.transpose() * v_des_robot;
-
-    const double max_pos_error = .1;
     double xStart = world_position_desired[0];
     double yStart = world_position_desired[1];
 
-    if (xStart - p[0] > max_pos_error)
-      xStart = p[0] + max_pos_error;
-    if (p[0] - xStart > max_pos_error)
-      xStart = p[0] - max_pos_error;
+    if (xStart - seResult.position(0) > 0.1)
+      xStart = seResult.position(0) + 0.1;
+    if (seResult.position(0) - xStart > 0.1)
+      xStart = seResult.position(0) - 0.1;
 
-    if (yStart - p[1] > max_pos_error)
-      yStart = p[1] + max_pos_error;
-    if (p[1] - yStart > max_pos_error)
-      yStart = p[1] - max_pos_error;
+    if (yStart - seResult.position(1) > 0.1)
+      yStart = seResult.position(1) + 0.1;
+    if (seResult.position(1) - yStart > 0.1)
+      yStart = seResult.position(1) - 0.1;
 
     world_position_desired[0] = xStart;
     world_position_desired[1] = yStart;
 
-    double trajInitial[12] = {                                              // stateCommand->data.stateDes[3],
-                              rpy_comp[0] + stateCommand->data.stateDes[3], // 0
-                              rpy_comp[1] + stateCommand->data.stateDes[4], // 1
-                              stateCommand->data.stateDes[5],               // 2
-                              xStart,                                       // 3
-                              yStart,                                       // 4
-                              0.3,                                          // 5
-                              0,                                            // 6
-                              0,                                            // 7
-                              stateCommand->data.stateDes[11],              // 8
-                              v_des_world[0],                               // 9
-                              v_des_world[1],                               // 10
-                              v_des_world[2]};                              // 11
-    if (data._quadruped->robot_index == 1)
-    {
-      trajInitial[5] = 0.35;
-    }
+    double trajInitial[12] = {rpy_comp[0] + stateCommand->data.stateDes[3], rpy_comp[1] + stateCommand->data.stateDes[4], stateCommand->data.stateDes[5],
+                              world_position_desired[0], world_position_desired[1], world_position_desired[2],
+                              0, 0, stateCommand->data.stateDes[11],
+                              v_des_world[0], v_des_world[1], v_des_world[2]};
     if (climb)
     {
       trajInitial[1] += ground_pitch;
@@ -342,22 +286,19 @@ void NominalMPC::updateMPCIfNeeded(int *mpcTable, ControlFSMData &data)
         trajAll[12 * i + 2] = trajAll[12 * (i - 1) + 2] + dtMPC * stateCommand->data.stateDes[11];
       }
     }
-
-    Timer t1;
-    t1.start();
-    dtMPC = dt * iterationsBetweenMPC;
-    Timer t2;
-    t2.start();
-    solver.update_problem_data(p, v, q, w, r, yaw, weights, trajAll, alpha, mpcTable);
+    solver.update_problem_data(seResult.position.data(), seResult.vWorld.data(), seResult.orientation.data(),
+                               seResult.omegaWorld.data(), r, seResult.rpy[2], Q.data(), trajAll, alpha, mpcTable);
 
     for (int leg = 0; leg < 4; leg++)
     {
       Vec3<double> f;
       for (int axis = 0; axis < 3; axis++)
+      {
         f[axis] = solver.get_solution(leg * 3 + axis);
-
-      // f_ff[leg] =  - coordinateRotation(CoordinateAxis::Z, seResult.rpy[2]) * f;
+      }
       f_ff[leg] = -seResult.rBody * f;
     }
   }
+
+  iterationCounter++;
 }

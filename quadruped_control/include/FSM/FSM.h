@@ -6,8 +6,6 @@
 #include "FSMState_PDStand.h"
 #include "FSMState_QPStand.h"
 #include "FSMState_Walking.h"
-#include "FSMState_ThreeFoot.h"
-#include "FSMState_Climb.h"
 #include "FSMState_Manipulation.h"
 #include <common/enumClass.h>
 
@@ -17,8 +15,6 @@ struct FSMStateList{
     FSMState_PDStand *pdstand;
     FSMState_QPStand *qpstand;
     FSMState_Walking *walking;
-    FSMState_ThreeFoot *threefoot;
-    FSMState_Climb * climb;
     FSMState_Manipulation *manipulation;
    
     void deletePtr(){
@@ -26,8 +22,6 @@ struct FSMStateList{
         delete passive;
         delete qpstand;
         delete walking;
-        delete threefoot;
-        delete climb;
         delete manipulation;
     }  
 };

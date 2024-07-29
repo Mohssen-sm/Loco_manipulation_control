@@ -10,8 +10,6 @@ FSM::FSM(ControlFSMData *data)
     _stateList.pdstand = new FSMState_PDStand(_data);
     _stateList.qpstand = new FSMState_QPStand(_data);
     _stateList.walking = new FSMState_Walking(_data);
-    _stateList.threefoot = new FSMState_ThreeFoot(_data);
-    _stateList.climb = new FSMState_Climb(_data);
     _stateList.manipulation = new FSMState_Manipulation(_data);
     // add other FSM states later
 
@@ -97,12 +95,6 @@ FSMState *FSM::getNextState(FSMStateName stateName)
         break;
     case FSMStateName::WALKING:
         return _stateList.walking;
-        break;
-    case FSMStateName::THREEFOOT:
-        return _stateList.threefoot;
-        break;
-    case FSMStateName::CLIMB:
-        return _stateList.climb;
         break;
     case FSMStateName::MANIPULATION:
         return _stateList.manipulation;
