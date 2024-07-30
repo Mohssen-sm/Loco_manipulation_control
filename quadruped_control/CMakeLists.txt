@@ -5,13 +5,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(catkin REQUIRED 
     COMPONENTS
-    controller_manager
     genmsg
-    joint_state_controller
-    robot_state_publisher
     roscpp
     std_msgs
-    unitree_legged_msgs 
     qpoases_catkin 
 )
 
@@ -28,7 +24,6 @@ catkin_package(
     LIBRARIES
     ${PROJECT_NAME}
     CATKIN_DEPENDS 
-    unitree_legged_msgs 
     qpoases_catkin
 )
 

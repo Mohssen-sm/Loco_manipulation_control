@@ -5,14 +5,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(catkin REQUIRED 
     COMPONENTS
-    gazebo_ros
-    gazebo_msgs
     tf
-    geometry_msgs
     a1_description
     aliengo_description
     go1_description
-    unitree_legged_msgs
     unitree_legged_control
     unitree_gazebo
     quadruped_control
@@ -26,6 +22,8 @@ catkin_package(
     a1_description
     aliengo_description
     go1_description
+    unitree_legged_control
+    unitree_gazebo
     quadruped_control
 )
 
