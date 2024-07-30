@@ -86,6 +86,7 @@ int main(int argc, char **argv)
     while (running)
     {
         _FSMController->run();
+        _controlData->sendRecv();
         rate.sleep();
     }
 
