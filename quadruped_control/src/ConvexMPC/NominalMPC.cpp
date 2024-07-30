@@ -22,7 +22,7 @@ NominalMPC::NominalMPC(double _dt, int horizon, Quadruped *quad)
   Q.resize(12);
   Q.setZero();
   KpJoint << 40, 40, 40;
-  MPCUpdateLoop = 30;
+  MPCUpdateLoop = 25;
 
   if (quad->robot_index == 1) // aliengo
   {
@@ -164,7 +164,7 @@ void NominalMPC::run(ControlFSMData &data)
     Pf = seResult.position +
          seResult.rBody.transpose() * pYawCorrected + seResult.vWorld * swingTimeRemaining[i];
 
-    double p_rel_max = 0.2;
+    double p_rel_max = 0.3;
     double pfx_rel = seResult.vWorld[0] * .5 * gait->_stance * dtMPC +
                      .03 * (seResult.vWorld[0] - v_des_world[0]) +
                      (0.5 * seResult.position[2] / 9.81) * (seResult.vWorld[1] * stateCommand->data.stateDes[11]);
@@ -286,9 +286,12 @@ void NominalMPC::run(ControlFSMData &data)
         trajAll[12 * i + 2] = trajAll[12 * (i - 1) + 2] + dtMPC * stateCommand->data.stateDes[11];
       }
     }
+    Timer t2;
+    t2.start();
     solver.update_problem_data(seResult.position.data(), seResult.vWorld.data(), seResult.orientation.data(),
                                seResult.omegaWorld.data(), r, seResult.rpy[2], Q.data(), trajAll, alpha, mpcTable);
 
+    // printf("MPC Solve time %f ms\n", t2.getMs());
     for (int leg = 0; leg < 4; leg++)
     {
       Vec3<double> f;

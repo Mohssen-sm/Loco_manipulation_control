@@ -75,7 +75,7 @@ public:
             thighLinkLength = 0.213;
             calfLinkLength = 0.213;
 
-            gait_iteration = 30;
+            gait_iteration = 50;
         }
     }
     int robot_index; // 1 for Aliengo, 2 for A1
