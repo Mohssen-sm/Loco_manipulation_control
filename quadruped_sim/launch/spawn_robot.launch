@@ -7,14 +7,14 @@
 
     <group ns="$(arg ns)">
         <param name="robot_description"
-            command="$(find xacro)/xacro $(find unitree_description)/xacro/robot.xacro 
+            command="$(find xacro)/xacro $(find quadruped_sim)/xacro/robot.xacro 
            ns:=$(arg ns) robot_type:=$(arg robot_type)" />
 
         <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
             args="-x $(arg x_pos) -y $(arg y_pos) -z 0.5 -Y $(arg yaw_angle) -param robot_description 
             -urdf -model $(arg ns)" output="screen" />
 
-        <rosparam file="$(find unitree_description)/config/robot_control.yaml" command="load" />
+        <rosparam file="$(find quadruped_sim)/config/robot_control.yaml" command="load" />
 
         <node pkg="controller_manager" type="spawner" name="controller_spawner" respawn="false"
             output="screen"

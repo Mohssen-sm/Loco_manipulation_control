@@ -10,15 +10,10 @@ find_package(catkin REQUIRED
     joint_state_controller
     robot_state_publisher
     roscpp
-    gazebo_ros
-    gazebo_msgs
     std_msgs
-    tf
-    geometry_msgs
     unitree_legged_msgs 
     qpoases_catkin 
 )
-find_package(gazebo REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS
         system
@@ -42,7 +37,6 @@ include_directories(
     ${Boost_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
-    ${GAZEBO_INCLUDE_DIRS}
 )
 
 # message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
@@ -55,7 +49,6 @@ endif()
 
 link_directories(
     include/sdk/lib/cpp/${ARCH}
-    ${GAZEBO_LIBRARY_DIRS}
 )
 
 file(GLOB_RECURSE SRC_LIST
@@ -80,10 +73,6 @@ target_link_libraries(${PROJECT_NAME}
         libunitree_legged_sdk.a
         )            
         
-# quad_control node
-add_executable(quad_control src/quad_control.cpp)
-add_dependencies(quad_control ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(quad_control ${PROJECT_NAME} ${catkin_LIBRARIES} -pthread lcm)
 
 # quad_control hardware node
 add_executable(quad_control_hardware src/quad_control_hardware.cpp)

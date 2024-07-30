@@ -10,7 +10,7 @@
 #include <common/PositionVelocityEstimator.h>
 #include <FSM/FSM.h>
 
-#include <interface/IOROS.h>
+#include "IOROS.h"
 
 bool running = true;
 

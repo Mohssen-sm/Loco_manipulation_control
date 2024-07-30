@@ -2,7 +2,7 @@
 #define IOROS_H
 
 #include "ros/ros.h"
-#include "IOInterface.h"
+#include <interface/IOInterface.h>
 #include "unitree_legged_msgs/LowCmd.h"
 #include "unitree_legged_msgs/LowState.h"
 #include "unitree_legged_msgs/MotorCmd.h"

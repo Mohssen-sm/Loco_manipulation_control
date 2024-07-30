@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 
-<robot name="unitree_description" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="quadruped_sim" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <xacro:arg name="ns" default=""/>
     <xacro:arg name="robot_type" default="aliengo"/>
 
-    <xacro:include filename="$(find unitree_description)/xacro/$(arg robot_type).xacro"/>
-    <xacro:include filename="$(find unitree_description)/xacro/gazebo.xacro"/>
+    <xacro:include filename="$(find quadruped_sim)/xacro/$(arg robot_type).xacro"/>
+    <xacro:include filename="$(find quadruped_sim)/xacro/gazebo.xacro"/>
 
     <gazebo>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">

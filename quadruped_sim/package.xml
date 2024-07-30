@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>unitree_description</name>
+    <name>quadruped_sim</name>
     <version>0.0.0</version>
-    <description>The unitree_description package</description>
+    <description>The quadruped_sim package</description>
 
-    <maintainer email="aliengo@unitree.cc">unitree</maintainer>
+    <maintainer email="somboles@usc.edu">Mohsen Sombolestan</maintainer>
     <license>TODO</license>
 
     <buildtool_depend>catkin</buildtool_depend>
@@ -16,5 +16,6 @@
     <depend>unitree_legged_control</depend>
     <depend>unitree_legged_msgs</depend>
     <depend>unitree_gazebo</depend>
+    <depend>quadruped_control</depend>
 
 </package>
