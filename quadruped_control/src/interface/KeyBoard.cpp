@@ -1,6 +1,8 @@
 #include <interface/KeyBoard.h>
 #include <iostream>
 
+using namespace std;
+
 KeyBoard::KeyBoard(){
     userCmd = UserCommand::NONE;
     userValue.setZero();

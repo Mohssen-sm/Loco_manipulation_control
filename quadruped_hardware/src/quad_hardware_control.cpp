@@ -40,7 +40,7 @@ int main()
     
     double dt = 0.001;
     std::string robot_name = "go1";    
-    int cmd_panel_id = 1; // Wireless=1, keyboard=2
+    int cmd_panel_id = 2; // Wireless=1, keyboard=2
     Quadruped quad(robot_name);
     IOInterface *ioInter;
     ioInter = new IOSDK(LeggedType::Go1, cmd_panel_id);

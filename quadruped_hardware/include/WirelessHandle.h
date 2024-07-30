@@ -2,7 +2,7 @@
 #define WIRELESSHANDLE_H
 
 #include <sdk/include/unitree_legged_sdk/joystick.h>
-#include "CmdPanel.h"
+#include <interface/CmdPanel.h>
 #include <sdk/include/unitree_legged_sdk/comm.h>
 
 class WirelessHandle : public CmdPanel{

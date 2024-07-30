@@ -1,6 +1,6 @@
 
 #include "sdk/IOSDK.h"
-#include "interface/WirelessHandle.h"
+#include "WirelessHandle.h"
 #include "interface/KeyBoard.h"
 #include "sdk/include/unitree_legged_sdk/unitree_legged_sdk.h"
 #include <stdio.h>
@@ -52,7 +52,7 @@ void IOSDK::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
         state->FootForce[i] = _lowState.footForce[i];
     }
 
-    cmdPanel->receiveHandle(&_lowState);
+    // cmdPanel->receiveHandle(&_lowState);
     state->userCmd = cmdPanel->getUserCmd();
     state->userValue = cmdPanel->getUserValue();
 
