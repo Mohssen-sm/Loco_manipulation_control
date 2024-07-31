@@ -31,19 +31,30 @@ if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "aarch64.*")
 endif()
 
 link_directories(
-    include/sdk/lib/cpp/${ARCH}
+    include/sdk_3_8_0/lib/cpp/${ARCH}
+    include/sdk_3_3_1/lib/cpp/${ARCH}
 )
 
-add_library(${PROJECT_NAME}
-        src/sdk/IOSDK.cpp
-        src/WirelessHandle.cpp
-        )
-target_link_libraries(${PROJECT_NAME}
-        ${catkin_LIBRARIES}
-        libunitree_legged_sdk.a
-        ) 
+set(SOURCES
+    src/IOSDK.cpp
+    src/WirelessHandle.cpp
+    src/quad_hardware_control.cpp
+)
 
-# quad_control node
-add_executable(quad_hardware_control src/quad_hardware_control.cpp)
-add_dependencies(quad_hardware_control ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(quad_hardware_control ${PROJECT_NAME} ${catkin_LIBRARIES} -pthread lcm)
+# # a1_control 
+# add_executable(a1_hardware_control ${SOURCES})
+# add_dependencies(a1_hardware_control ${catkin_EXPORTED_TARGETS})
+# target_compile_definitions(a1_hardware_control PRIVATE A1_ROBOT)
+# target_link_libraries(a1_hardware_control  ${catkin_LIBRARIES} -pthread lcm libunitree_legged_sdk.so)
+
+# # aliengo_control 
+# add_executable(aliengo_hardware_control ${SOURCES})
+# add_dependencies(aliengo_hardware_control ${catkin_EXPORTED_TARGETS})
+# target_compile_definitions(aliengo_hardware_control PRIVATE ALIENGO)
+# target_link_libraries(aliengo_hardware_control  ${catkin_LIBRARIES} -pthread lcm libunitree_legged_sdk.so)
+
+# go1_control 
+add_executable(go1_hardware_control ${SOURCES})
+add_dependencies(go1_hardware_control ${catkin_EXPORTED_TARGETS})
+target_compile_definitions(go1_hardware_control PRIVATE GO1)
+target_link_libraries(go1_hardware_control  ${catkin_LIBRARIES} -pthread lcm libunitree_legged_sdk.a)
