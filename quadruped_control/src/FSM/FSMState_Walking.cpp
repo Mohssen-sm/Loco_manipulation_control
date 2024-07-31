@@ -61,18 +61,7 @@ FSMStateName FSMState_Walking::checkTransition()
             return FSMStateName::WALKING;
         }
     }
-    else if(_lowState->userCmd == UserCommand::L2_X || walking2climb){
-        if(Cmpc.phase > 0.96){
-            std::cout << "transition from walking to climb" << std::endl;
-            walking2climb = false;
-            return FSMStateName::CLIMB;
-        }
-        else{
-            walking2climb = true;
-            return FSMStateName::WALKING;
-        }   
-    }
-    if(_lowState->userCmd == UserCommand::L2_B){
+    else if(_lowState->userCmd == UserCommand::L2_B){
         std::cout << "transition from walking to passive" << std::endl;
         return FSMStateName::PASSIVE;
     }

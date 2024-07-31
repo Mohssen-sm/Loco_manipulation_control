@@ -182,11 +182,6 @@ FSMStateName FSMState_QPStand::checkTransition()
         std::cout << "transition from QP stand to PD stand" << std::endl;
         return FSMStateName::PDSTAND;
     }
-    else if (_lowState->userCmd == UserCommand::L2_Y)
-    {
-        std::cout << "transition from QP stand to 3 foot" << std::endl;
-        return FSMStateName::THREEFOOT;
-    }
     else if (_lowState->userCmd == UserCommand::START)
     {
         std::cout << "transition from QP stand to walk" << std::endl;
@@ -196,11 +191,6 @@ FSMStateName FSMState_QPStand::checkTransition()
     {
         std::cout << "transition from QP stand to Manipulation" << std::endl;
         return FSMStateName::MANIPULATION;
-    }
-    else if (_lowState->userCmd == UserCommand::L2_X)
-    {
-        std::cout << "transition from QP stand to climb" << std::endl;
-        return FSMStateName::CLIMB;
     }
     if (_lowState->userCmd == UserCommand::L2_B)
     {

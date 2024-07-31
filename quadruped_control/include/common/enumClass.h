@@ -13,11 +13,11 @@ enum class UserCommand{
     // EXIT,
     NONE,
     START,      // walking
-    L2_A,       // fixedStand
+    L2_A,       // PDStand
     L2_B,       // passive
     L2_X,       // QPStand
-    L2_Y,       // threefoot
-    L1_X,       // climb
+    L2_Y,       
+    L1_X,       
     L1_A,      
     L1_Y        
 };
@@ -34,9 +34,6 @@ enum class FSMStateName{
     PDSTAND,
     QPSTAND,
     WALKING,
-    THREEFOOT,
-    CLIMB,
-    SLAM,       // slam
     MANIPULATION
 };
 

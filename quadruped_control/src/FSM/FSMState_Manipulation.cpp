@@ -51,7 +51,7 @@ FSMStateName FSMState_Manipulation::checkTransition()
     {
         if (Cmpc.phase > 0.96)
         {
-            std::cout << "transition from walk to QP stand" << std::endl;
+            std::cout << "transition from Manipulation to QP stand" << std::endl;
             manipulation2QP = false;
             return FSMStateName::QPSTAND;
         }
