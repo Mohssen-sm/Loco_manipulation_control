@@ -5,13 +5,11 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-using namespace UNITREE_LEGGED_SDK;
-
-IOSDK::IOSDK(LeggedType robot, int cmd_panel_id) : _control(robot),
+IOSDK::IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id) : _control(robot),
 #ifdef GO1
-                                                   _udp(LOWLEVEL, 8090, "192.168.123.10", 8007),
+                                                   _udp(UNITREE_LEGGED_SDK::LOWLEVEL, 8090, "192.168.123.10", 8007),
 #else
-                                                   _udp(LOWLEVEL),
+                                                   _udp(UNITREE_LEGGED_SDK::LOWLEVEL),
 #endif
                                                    loop_loco_manipulation("loco_manipulation", 0.001, boost::bind(&IOSDK::socketSendRecv, this))
 {

@@ -41,20 +41,20 @@ set(SOURCES
     src/quad_hardware_control.cpp
 )
 
-# # a1_control 
-# add_executable(a1_hardware_control ${SOURCES})
-# add_dependencies(a1_hardware_control ${catkin_EXPORTED_TARGETS})
-# target_compile_definitions(a1_hardware_control PRIVATE A1_ROBOT)
-# target_link_libraries(a1_hardware_control  ${catkin_LIBRARIES} -pthread lcm libunitree_legged_sdk.so)
+# a1_control 
+add_executable(a1_hardware_control ${SOURCES})
+add_dependencies(a1_hardware_control ${catkin_EXPORTED_TARGETS})
+target_compile_definitions(a1_hardware_control PRIVATE A1_ROBOT)
+target_link_libraries(a1_hardware_control  ${catkin_LIBRARIES} -pthread libunitree_legged_sdk_amd64.so lcm)
 
-# # aliengo_control 
-# add_executable(aliengo_hardware_control ${SOURCES})
-# add_dependencies(aliengo_hardware_control ${catkin_EXPORTED_TARGETS})
-# target_compile_definitions(aliengo_hardware_control PRIVATE ALIENGO)
-# target_link_libraries(aliengo_hardware_control  ${catkin_LIBRARIES} -pthread lcm libunitree_legged_sdk.so)
+# aliengo_control 
+add_executable(aliengo_hardware_control ${SOURCES})
+add_dependencies(aliengo_hardware_control ${catkin_EXPORTED_TARGETS})
+target_compile_definitions(aliengo_hardware_control PRIVATE ALIENGO)
+target_link_libraries(aliengo_hardware_control  ${catkin_LIBRARIES} -pthread libunitree_legged_sdk_amd64.so lcm)
 
 # go1_control 
 add_executable(go1_hardware_control ${SOURCES})
 add_dependencies(go1_hardware_control ${catkin_EXPORTED_TARGETS})
 target_compile_definitions(go1_hardware_control PRIVATE GO1)
-target_link_libraries(go1_hardware_control  ${catkin_LIBRARIES} -pthread lcm libunitree_legged_sdk.a)
+target_link_libraries(go1_hardware_control  ${catkin_LIBRARIES} -pthread libunitree_legged_sdk.a)

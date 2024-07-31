@@ -12,8 +12,6 @@
 
 #include "IOSDK.h"
 
-using namespace UNITREE_LEGGED_SDK;
-
 bool running = true;
 
 void ShutDown(int sig)
@@ -41,13 +39,13 @@ int main()
     int cmd_panel_id = 2; // Wireless=1, keyboard=2
     IOInterface *ioInter;
 #ifdef A1_ROBOT
-    ioInter = new IOSDK(LeggedType::A1, cmd_panel_id);
+    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::A1, cmd_panel_id);
     Quadruped quad("a1");
 #elif ALIENGO
-    ioInter = new IOSDK(LeggedType::Aliengo, cmd_panel_id);
+    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::Aliengo, cmd_panel_id);
     Quadruped quad("aliengo");
 #elif GO1
-    ioInter = new IOSDK(LeggedType::Go1, cmd_panel_id);
+    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::Go1, cmd_panel_id);
     Quadruped quad("go1");
 #endif
 
@@ -76,8 +74,8 @@ int main()
 
     FSM *_FSMController = new FSM(_controlData);
 
-    LoopFunc loop_control("control_loop", dt, boost::bind(&FSM::run, _FSMController));
-    LoopFunc loop_udpSend("udp_send", dt, 3, boost::bind(&ControlFSMData::sendRecv, _controlData));
+    UNITREE_LEGGED_SDK::LoopFunc loop_control("control_loop", dt, boost::bind(&FSM::run, _FSMController));
+    UNITREE_LEGGED_SDK::LoopFunc loop_udpSend("udp_send", dt, 3, boost::bind(&ControlFSMData::sendRecv, _controlData));
 
     loop_udpSend.start();
     loop_control.start();
