@@ -2,10 +2,16 @@
 #include <string.h>
 #include <stdio.h>
 
-WirelessHandle::WirelessHandle(){}
+WirelessHandle::WirelessHandle(UNITREE_LEGGED_SDK::LowState *lowState){
+    _lowState = lowState;
+    userCmd = UserCommand::NONE;
+    userValue.setZero();
 
-void WirelessHandle::receiveHandle(UNITREE_LEGGED_SDK::LowState *lowState){
-    memcpy(&_keyData, &lowState->wirelessRemote[0], 40);
+    pthread_create(&_tid, NULL, runWirelessHandle, (void*)this);
+}
+
+void* WirelessHandle::run(void *arg){
+    memcpy(&_keyData, &_lowState->wirelessRemote[0], 40);
 
     if(((int)_keyData.btn.components.L2 == 1) && 
        ((int)_keyData.btn.components.B  == 1)){
@@ -55,4 +61,8 @@ void WirelessHandle::receiveHandle(UNITREE_LEGGED_SDK::LowState *lowState){
     // double last_ry = userValue.ry;
     userValue.ry = _keyData.ry;
 
+}
+
+void* WirelessHandle::runWirelessHandle(void *arg){
+    ((WirelessHandle*)arg)->run(NULL);
 }

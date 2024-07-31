@@ -17,7 +17,7 @@ IOSDK::IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id) : _control(
     _udp.InitCmdData(_lowCmd);
     if (cmd_panel_id == 1)
     {
-        // cmdPanel = new WirelessHandle();
+        cmdPanel = new WirelessHandle(&_lowState);
     }
     else if (cmd_panel_id == 2)
     {

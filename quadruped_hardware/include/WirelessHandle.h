@@ -12,14 +12,18 @@
 #include <boost/bind.hpp>
 #include <interface/CmdPanel.h>
 
-class WirelessHandle : public CmdPanel{
+class WirelessHandle : public CmdPanel
+{
 public:
-    WirelessHandle();
-    ~WirelessHandle(){}
-    void receiveHandle(UNITREE_LEGGED_SDK::LowState *lowState);
+    WirelessHandle(UNITREE_LEGGED_SDK::LowState *lowState);
+    ~WirelessHandle();
+
 private:
+    static void *runWirelessHandle(void *arg);
+    void *run(void *arg);
     xRockerBtnDataStruct _keyData;
-    // LPFilter *_L2Value, *_lxValue, *_lyValue, *_rxValue, *_ryValue;
+    UNITREE_LEGGED_SDK::LowState *_lowState;
+    pthread_t _tid;
 };
 
-#endif  // WIRELESSHANDLE_H
+#endif // WIRELESSHANDLE_H
