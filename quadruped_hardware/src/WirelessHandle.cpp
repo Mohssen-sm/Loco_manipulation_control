@@ -7,10 +7,26 @@ WirelessHandle::WirelessHandle(UNITREE_LEGGED_SDK::LowState *lowState){
     userCmd = UserCommand::NONE;
     userValue.setZero();
 
+    tcgetattr( fileno( stdin ), &_oldSettings );
+    _newSettings = _oldSettings;
+    _newSettings.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr( fileno( stdin ), TCSANOW, &_newSettings );
+
     pthread_create(&_tid, NULL, runWirelessHandle, (void*)this);
 }
 
+WirelessHandle::~WirelessHandle(){
+    pthread_cancel(_tid);
+    pthread_join(_tid, NULL);
+    tcsetattr( fileno( stdin ), TCSANOW, &_oldSettings );
+}
+
+void* WirelessHandle::runWirelessHandle(void *arg){
+    ((WirelessHandle*)arg)->run(NULL);
+}
+
 void* WirelessHandle::run(void *arg){
+    while(1){
     memcpy(&_keyData, &_lowState->wirelessRemote[0], 40);
 
     if(((int)_keyData.btn.components.L2 == 1) && 
@@ -60,9 +76,6 @@ void* WirelessHandle::run(void *arg){
 
     // double last_ry = userValue.ry;
     userValue.ry = _keyData.ry;
+    }
 
-}
-
-void* WirelessHandle::runWirelessHandle(void *arg){
-    ((WirelessHandle*)arg)->run(NULL);
 }

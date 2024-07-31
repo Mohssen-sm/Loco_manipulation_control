@@ -11,6 +11,7 @@
 
 #include <boost/bind.hpp>
 #include <interface/CmdPanel.h>
+#include <termios.h>
 
 class WirelessHandle : public CmdPanel
 {
@@ -24,6 +25,7 @@ private:
     xRockerBtnDataStruct _keyData;
     UNITREE_LEGGED_SDK::LowState *_lowState;
     pthread_t _tid;
+    struct termios _oldSettings, _newSettings;
 };
 
 #endif // WIRELESSHANDLE_H

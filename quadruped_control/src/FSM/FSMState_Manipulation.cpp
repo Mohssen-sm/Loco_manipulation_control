@@ -47,7 +47,7 @@ void FSMState_Manipulation::exit()
 
 FSMStateName FSMState_Manipulation::checkTransition()
 {
-    if (_lowState->userCmd == UserCommand::START || manipulation2QP)
+    if (_lowState->userCmd == UserCommand::L1_X || manipulation2QP)
     {
         if (Cmpc.phase > 0.96)
         {

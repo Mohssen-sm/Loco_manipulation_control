@@ -66,7 +66,6 @@ void IOSDK::sendRecv(const LowlevelCmd *cmd, LowlevelState *state)
         state->FootForce[i] = _lowState.footForce[i];
     }
 
-    // cmdPanel->receiveHandle(&_lowState);
     state->userCmd = cmdPanel->getUserCmd();
     state->userValue = cmdPanel->getUserValue();
 

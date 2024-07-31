@@ -49,7 +49,7 @@ void FSMState_Walking::exit()
 
 FSMStateName FSMState_Walking::checkTransition()
 {
-    if(_lowState->userCmd == UserCommand::START || walking2QP){
+    if(_lowState->userCmd == UserCommand::L1_X || walking2QP){
         if(Cmpc.phase > 0.96){
             std::cout << "transition from walk to QP stand" << std::endl;
             walking2QP = false;
