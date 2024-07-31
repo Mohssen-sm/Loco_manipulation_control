@@ -32,6 +32,14 @@ void FSM::initialize()
 
 void FSM::run()
 {
+    if(count ==1)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            _data->_lowState->Init_FootForce[i] = _data->_lowState->FootForce[i];
+        }
+    }
+    
     if (!checkSafty())
     {
         _data->_interface->setPassive();

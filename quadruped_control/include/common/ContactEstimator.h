@@ -29,7 +29,10 @@ class ContactEstimator : public GenericEstimator {
     //     *this->_stateEstimatorData.contactPhase;
 
     for(int i = 0; i < 4; i++){
-      if(this->_stateEstimatorData.lowState->FootForce[i] > 200){
+ 
+      if(this->_stateEstimatorData.lowState->FootForce[i] 
+         - this->_stateEstimatorData.lowState->Init_FootForce[i] > 15)
+      {
         this->_stateEstimatorData.result->contactEstimate(i) = 0.5;
       }
 
