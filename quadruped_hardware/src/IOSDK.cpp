@@ -5,13 +5,13 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-IOSDK::IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id) : _control(robot),
+IOSDK::IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id, int port) : _control(robot),
 #ifdef GO1
-                                                   _udp(UNITREE_LEGGED_SDK::LOWLEVEL, 8090, "192.168.123.10", 8007),
+                                                                                 _udp(UNITREE_LEGGED_SDK::LOWLEVEL, 8090, "192.168.123.10", 8007),
 #else
-                                                   _udp(UNITREE_LEGGED_SDK::LOWLEVEL),
+                                                                                 _udp(UNITREE_LEGGED_SDK::LOWLEVEL),
 #endif
-                                                   loop_loco_manipulation("loco_manipulation", 0.001, boost::bind(&IOSDK::socketSendRecv, this))
+                                                                                 loop_loco_manipulation("loco_manipulation", 0.001, boost::bind(&IOSDK::socketSendRecv, this))
 {
 
     _udp.InitCmdData(_lowCmd);
@@ -24,8 +24,9 @@ IOSDK::IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id) : _control(
         cmdPanel = new KeyBoard();
     }
     rotmat = Eigen::Matrix3d::Identity();
-    // setupSocket(8188);
-    // loop_loco_manipulation.start();
+
+    std::thread socketThread(&IOSDK::setupSocket, this, port);
+    socketThread.detach();
 }
 
 void IOSDK::sendRecv(const LowlevelCmd *cmd, LowlevelState *state)
@@ -69,26 +70,13 @@ void IOSDK::sendRecv(const LowlevelCmd *cmd, LowlevelState *state)
     state->userCmd = cmdPanel->getUserCmd();
     state->userValue = cmdPanel->getUserValue();
 
-    if (planner_running)
+    for (int i = 0; i < 2; i++)
     {
-        for (int i = 0; i < 2; i++)
-        {
-            state->userValue.manipulation_force[i] = Highcmd.manipulation_force(i);
-        }
-        state->userValue.vx = Highcmd.velocity_cmd[0];
-        state->userValue.vy = Highcmd.velocity_cmd[1];
-        state->userValue.turn_rate = Highcmd.omega_cmd[2];
+        state->userValue.manipulation_force[i] = Highcmd.manipulation_force(i);
     }
-    else
-    {
-        for (int i = 0; i < 2; i++)
-        {
-            state->userValue.manipulation_force[i] = 0;
-        }
-        state->userValue.vx = 0;
-        state->userValue.vy = 0;
-        state->userValue.turn_rate = 0;
-    }
+    state->userValue.vx = Highcmd.velocity_cmd[0];
+    state->userValue.vy = Highcmd.velocity_cmd[1];
+    state->userValue.turn_rate = Highcmd.omega_cmd[2];
 
     // _control.PowerProtect(_lowCmd, _lowState, 10);
 
@@ -132,6 +120,10 @@ int IOSDK::setupSocket(int port)
         std::cerr << "Error accepting connection" << std::endl;
         return -1;
     }
+
+    // start the loop
+    loop_loco_manipulation.start();
+
     return 0;
 }
 
@@ -141,18 +133,16 @@ void IOSDK::socketSendRecv()
     if (bytesRead == -1)
     {
         std::cerr << "Error receiving data" << std::endl;
-        planner_running = false;
     }
     else
     {
-        planner_running = true;
         std::cout << "Received: " << _dataRecv.force[0] << std::endl;
 
-        Eigen::Vector3d force_body = (Eigen::Vector3d() << _dataRecv.force[0], _dataRecv.force[1], 0).finished();
-        Highcmd.manipulation_force = rotmat * force_body;
+        // Eigen::Vector3d force_body = (Eigen::Vector3d() << _dataRecv.force[0], _dataRecv.force[1], 0).finished();
+        // Highcmd.manipulation_force = rotmat * force_body;
 
-        Highcmd.omega_cmd[2] = _dataRecv.omega[2];
-        Highcmd.velocity_cmd[1] = _dataRecv.velocity[1]; // + 3 * (distance_body[1]);
-        // Highcmd.velocity_cmd[0] = 2 * (distance_body[0] - _quad.leg_offset_x);
+        // Highcmd.omega_cmd[2] = _dataRecv.omega[2];
+        // Highcmd.velocity_cmd[1] = _dataRecv.velocity[1]; // + 3 * (distance_body[1]);
+        // // Highcmd.velocity_cmd[0] = 2 * (distance_body[0] - _quad.leg_offset_x);
     }
 }

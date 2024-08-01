@@ -23,17 +23,27 @@ struct DataRecv
     float quaternion[4];
     float position[3];
     float velocity[3];
-    float omega[3];
     float force[3];
-};
-struct DataSend
-{
-    bool contact;
+    float omega[3];
+    DataRecv()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            quaternion[i] = 0;
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            position[i] = 0;
+            velocity[i] = 0;
+            force[i] = 0;
+            omega[i] = 0;
+        }
+    }
 };
 class IOSDK : public IOInterface
 {
 public:
-    IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id);
+    IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id, int port);
     ~IOSDK()
     {
         loop_loco_manipulation.shutdown();
@@ -51,8 +61,6 @@ private:
     int serverSocket;
     int clientSocket;
     DataRecv _dataRecv;
-    DataSend _dataSend;
-    bool planner_running = false;
     HighlevelCmd Highcmd;
     Eigen::Matrix3d rotmat;
     UNITREE_LEGGED_SDK::LoopFunc loop_loco_manipulation;

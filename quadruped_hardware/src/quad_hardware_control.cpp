@@ -39,13 +39,13 @@ int main()
     int cmd_panel_id = 2; // Wireless=1, keyboard=2
     IOInterface *ioInter;
 #ifdef A1_ROBOT
-    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::A1, cmd_panel_id);
+    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::A1, cmd_panel_id, 8178);
     Quadruped quad("a1");
 #elif ALIENGO
-    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::Aliengo, cmd_panel_id);
+    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::Aliengo, cmd_panel_id, 8188);
     Quadruped quad("aliengo");
 #elif GO1
-    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::Go1, cmd_panel_id);
+    ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::Go1, cmd_panel_id, 8198);
     Quadruped quad("go1");
 #endif
 
