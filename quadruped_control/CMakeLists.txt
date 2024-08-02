@@ -8,7 +8,6 @@ find_package(catkin REQUIRED
     genmsg
     roscpp
     std_msgs
-    qpoases_catkin 
 )
 
 find_package(Boost REQUIRED COMPONENTS
@@ -24,8 +23,10 @@ catkin_package(
     LIBRARIES
     ${PROJECT_NAME}
     CATKIN_DEPENDS 
-    qpoases_catkin
 )
+
+include_directories(${CMAKE_BINARY_DIR})
+add_subdirectory(third_party/qpOASES)
 
 include_directories(
     include
@@ -47,4 +48,5 @@ add_library(${PROJECT_NAME}
         )
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
+        qpOASES
         ) 

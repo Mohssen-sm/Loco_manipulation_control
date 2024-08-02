@@ -22,7 +22,7 @@ Cheetah-3-Documentation-Control:
 #endif
 
 #include <eigen3/Eigen/Dense>
-#include <qpOASES.hpp>
+#include "../third_party/qpOASES/include/qpOASES.hpp"
 
 
 //#include "sim_command_t.hpp"

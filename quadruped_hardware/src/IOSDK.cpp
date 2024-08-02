@@ -136,13 +136,19 @@ void IOSDK::socketSendRecv()
     }
     else
     {
-        std::cout << "Received: " << _dataRecv.force[0] << std::endl;
+        std::cout << "Received Force: " << _dataRecv.force[0] << std::endl;
+        std::cout << "Received Vel: " << _dataRecv.velocity[1] << std::endl;
+        std::cout << "Received Omega: " << _dataRecv.omega[2] << std::endl;
 
-        // Eigen::Vector3d force_body = (Eigen::Vector3d() << _dataRecv.force[0], _dataRecv.force[1], 0).finished();
+
+        // Eigen::Vector3d force_body = (Eigen::Vector3d() << _dataRecv.force[0], 0, 0).finished();
         // Highcmd.manipulation_force = rotmat * force_body;
 
         // Highcmd.omega_cmd[2] = _dataRecv.omega[2];
+
+        // Highcmd.velocity_cmd[0] = 0.05;
+
         // Highcmd.velocity_cmd[1] = _dataRecv.velocity[1]; // + 3 * (distance_body[1]);
-        // // Highcmd.velocity_cmd[0] = 2 * (distance_body[0] - _quad.leg_offset_x);
+        
     }
 }
