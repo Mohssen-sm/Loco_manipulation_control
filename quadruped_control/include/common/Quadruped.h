@@ -33,7 +33,7 @@ public:
         { // Aliengo
             mass = 20;
             Ig << 0.0875, 1.293, 1.338;
-            COM_height = 0.4;
+            COM_height = 0.35;
 
             leg_offset_x = 0.2399;
             leg_offset_y = 0.051;
@@ -59,7 +59,7 @@ public:
             thighLinkLength = 0.2;
             calfLinkLength = 0.2;
 
-            gait_iteration = 30;
+            gait_iteration = 40;
         }
         else if (robot_index == 3)
         { // Go1
@@ -75,10 +75,10 @@ public:
             thighLinkLength = 0.213;
             calfLinkLength = 0.213;
 
-            gait_iteration = 50;
+            gait_iteration = 40;
         }
     }
-    int robot_index; // 1 for Aliengo, 2 for A1
+    int robot_index; // 1 for Aliengo, 2 for A1, 3 Go1
     double hipLinkLength;
     double thighLinkLength;
     double calfLinkLength;
