@@ -26,9 +26,13 @@ void FSMState_Manipulation::run()
     _userValue = _data->_lowState->userValue;
     // adjusthte velocity range based on the gait cycle time
     // v_des_body[0] = (double)invNormalize(_userValue.ly, -3.0, 3.0); // change this velocity limit for different robots
-    v_des_body[0] = _userValue.vx; // Aliengo
-    v_des_body[1] = _userValue.vy;
-    turn_rate = _userValue.turn_rate;
+    // v_des_body[0] = _userValue.vx; // Aliengo
+    // v_des_body[1] = _userValue.vy;
+    // turn_rate = _userValue.turn_rate;
+
+    v_des_body[0] = (double)invNormalize(_userValue.ly, -1.0, 1.0); // Aliengo 
+    v_des_body[1] = (double)invNormalize(_userValue.rx, 0.5, -0.5);
+    turn_rate = (double)invNormalize(_userValue.lx, 2.0, -2.0);
 
     _data->_desiredStateCommand->setStateCommands(roll, pitch, v_des_body, turn_rate);
 
