@@ -58,7 +58,7 @@ void FSM::run()
         }
         else if (count > 5000 && count < 6000) 
         {
-            _nextStateName = FSMStateName::MANIPULATION;
+            _nextStateName = FSMStateName::WALKING;
         }
         if (_nextStateName != _currentState->_stateName)
         {

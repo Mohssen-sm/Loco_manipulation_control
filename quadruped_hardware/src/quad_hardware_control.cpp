@@ -36,7 +36,7 @@ int main()
     setProcessScheduler();
 
     double dt = 0.001;
-    int cmd_panel_id = 1; // Wireless=1, keyboard=2
+    int cmd_panel_id = 2; // Wireless=1, keyboard=2
     IOInterface *ioInter;
 #ifdef A1_ROBOT
     ioInter = new IOSDK(UNITREE_LEGGED_SDK::LeggedType::A1, cmd_panel_id, 8178);

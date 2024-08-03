@@ -27,6 +27,7 @@ IOSDK::IOSDK(UNITREE_LEGGED_SDK::LeggedType robot, int cmd_panel_id, int port) :
 
     std::thread socketThread(&IOSDK::setupSocket, this, port);
     socketThread.detach();
+    loop_loco_manipulation.start();
 }
 
 void IOSDK::sendRecv(const LowlevelCmd *cmd, LowlevelState *state)
@@ -122,7 +123,7 @@ int IOSDK::setupSocket(int port)
     }
 
     // start the loop
-    loop_loco_manipulation.start();
+    
 
     return 0;
 }
@@ -130,24 +131,24 @@ int IOSDK::setupSocket(int port)
 void IOSDK::socketSendRecv()
 {
     ssize_t bytesRead = recv(clientSocket, &_dataRecv, sizeof(_dataRecv), 0);
-    if (bytesRead == -1)
-    {
-        std::cerr << "Error receiving data" << std::endl;
-    }
-    else
-    {
-        std::cout << "Received Force: " << _dataRecv.force[0] << std::endl;
-        std::cout << "Received Vel: " << _dataRecv.velocity[1] << std::endl;
-        std::cout << "Received Omega: " << _dataRecv.omega[2] << std::endl;
+    // if (bytesRead == -1)
+    // {
+    //     std::cerr << "Error receiving data" << std::endl;
+    // }
+    // else
+    // // {
+    //     std::cout << "Received Force: " << _dataRecv.force[0] << std::endl;
+    //     std::cout << "Received Vel: " << _dataRecv.velocity[1] << std::endl;
+    //     std::cout << "Received Omega: " << _dataRecv.omega[2] << std::endl;
 
 
-        // Eigen::Vector3d force_body = (Eigen::Vector3d() << _dataRecv.force[0], 0, 0).finished();
-        // Highcmd.manipulation_force = rotmat * force_body;
+        Eigen::Vector3d force_body = (Eigen::Vector3d() << 45, 0, 0).finished();
+        Highcmd.manipulation_force = rotmat * force_body;
 
         // Highcmd.omega_cmd[2] = _dataRecv.omega[2];
 
-        // Highcmd.velocity_cmd[0] = 0.05;
+        Highcmd.velocity_cmd[0] = 0.05;
 
-        // Highcmd.velocity_cmd[1] = _dataRecv.velocity[1]; // + 3 * (distance_body[1]);
-    }
+        Highcmd.velocity_cmd[1] = 0.05; // + 3 * (distance_body[1]);
+    // }
 }
