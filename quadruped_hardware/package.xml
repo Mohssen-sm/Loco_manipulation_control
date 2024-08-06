@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>quadruped_hardware</name>
+    <version>0.0.0</version>
+    <description>The quadruped_sim package</description>
+
+    <maintainer email="somboles@usc.edu">Mohsen Sombolestan</maintainer>
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <depend>quadruped_control</depend>
+
+</package>

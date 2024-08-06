@@ -13,28 +13,58 @@
 
 #include <common/StateEstimatorContainer.h>
 
-
 /*!
  * A "passthrough" contact estimator which returns the expected contact state
  */
-class ContactEstimator : public GenericEstimator {
- public:
-
+class ContactEstimator : public GenericEstimator
+{
+public:
   /*!
    * Set the estimated contact by copying the exptected contact state into the
    * estimated contact state
    */
-  virtual void run() {
+  virtual void run()
+  {
     // this->_stateEstimatorData.result->contactEstimate =
     //     *this->_stateEstimatorData.contactPhase;
 
-    for(int i = 0; i < 4; i++){
-      if(this->_stateEstimatorData.lowState->FootForce[i] > 15){
-        this->_stateEstimatorData.result->contactEstimate(i) = 0.5;
-      }
+    for (int i = 0; i < 4; i++)
+    {
 
-      else{
-        this->_stateEstimatorData.result->contactEstimate(i) = 0;
+      if (this->_stateEstimatorData.legControllerData->quadptr->robot_index == 3) // go1
+      {
+        if (this->_stateEstimatorData.lowState->FootForce[i] > 200)
+        {
+          this->_stateEstimatorData.result->contactEstimate(i) = 0.5;
+        }
+        else
+        {
+          this->_stateEstimatorData.result->contactEstimate(i) = 0;
+        }
+      }
+      else if (this->_stateEstimatorData.legControllerData->quadptr->robot_index == 1) // aliengo
+      {
+
+        if (this->_stateEstimatorData.lowState->FootForce[i] - this->_stateEstimatorData.lowState->Init_FootForce[i] > 15)
+        {
+          this->_stateEstimatorData.result->contactEstimate(i) = 0.5;
+        }
+
+        else
+        {
+          this->_stateEstimatorData.result->contactEstimate(i) = 0;
+        }
+      }
+      else // a1
+      {
+        if (this->_stateEstimatorData.lowState->FootForce[i] > 10)
+        {
+          this->_stateEstimatorData.result->contactEstimate(i) = 0.5;
+        }
+        else
+        {
+          this->_stateEstimatorData.result->contactEstimate(i) = 0;
+        }
       }
     }
   }
@@ -45,4 +75,4 @@ class ContactEstimator : public GenericEstimator {
   virtual void setup() {}
 };
 
-#endif  // PROJECT_CONTACTESTIMATOR_H
+#endif // PROJECT_CONTACTESTIMATOR_H

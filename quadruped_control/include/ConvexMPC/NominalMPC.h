@@ -36,7 +36,7 @@ protected:
   Vec3<double> Pf;
   double alpha;
   Eigen::VectorXd Q;
-  Vec3<double> KpJoint;
+  Vec3<double> KpJoint, KdJointStance, KdJointSwing;
   Mat3<double> Kp, Kd, Kp_stance, Kd_stance;
 
   Vec3<double> f_ff[4];

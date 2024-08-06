@@ -62,7 +62,7 @@ FSMStateName FSMState_PDStand::checkTransition()
         std::cout << "transition from PD stand to passive" << std::endl;
         return FSMStateName::PASSIVE;
     }
-    else if (_lowState->userCmd == UserCommand::L2_A)
+    else if (_lowState->userCmd == UserCommand::L1_X)
     {
         std::cout << "transition from PD stand to QP stand" << std::endl;
         return FSMStateName::QPSTAND;

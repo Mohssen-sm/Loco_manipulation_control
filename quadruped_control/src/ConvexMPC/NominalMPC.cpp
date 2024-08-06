@@ -17,31 +17,32 @@ NominalMPC::NominalMPC(double _dt, int horizon, Quadruped *quad)
   {
     firstSwing[i] = true;
   }
-  alpha = 4e-5;
 
+  alpha = 4e-5;
   Q.resize(12);
   Q.setZero();
   KpJoint << 40, 40, 40;
-  MPCUpdateLoop = 30;
+
+  KdJointStance << 1, 1, 1;
+  KdJointSwing << 1, 1, 1;
+
+  MPCUpdateLoop = 25;
+  
+  footSwingHeight = 0.08;
 
   if (quad->robot_index == 1) // aliengo
   {
-    // Q << 8.0, 5.0, 10, 6, 1.5, 15, 0, 0, 0.3, 0.2, 0.2, 0.2;
-    Q << 15.0, 12.0, 10, 1.5, 1.5, 60, 0, 0, 0.3, 0.2, 0.2, 0.2;
-    footSwingHeight = 0.12;
-    KpJoint << 80, 80, 80;
+    Q << 8.0, 5.0, 10, 1.5, 1.5, 15, 0, 0, 0.3, 0.4, 0.4, 0.4;
+    // Q << 15.0, 12.0, 10, 1.5, 1.5, 60, 0, 0, 0.3, 0.2, 0.2, 0.2;
   }
   else if (quad->robot_index == 2) // a1
   {
     Q << 0.5, 0.5, 10, 2.5, 2.5, 20, 0, 0, 0.3, 0.4, 0.4, 0.4;
-    footSwingHeight = 0.1;
-    KpJoint << 80, 80, 80;
   }
   else if (quad->robot_index == 3) // go1
   {
     Q << 15.0, 12.0, 10, 1.5, 1.5, 35, 0, 0, 0.3, 0.2, 0.2, 0.2;
-    footSwingHeight = 0.1;
-    KpJoint << 40, 40, 40;
+    KdJointSwing << 2, 2, 2;
   }
 }
 
@@ -106,7 +107,7 @@ void NominalMPC::run(ControlFSMData &data)
   }
   a = W.transpose() * W * (W.transpose() * W * W.transpose() * W).inverse() * W.transpose() * pz;
   ground_pitch = acos(-1 / sqrt(a[1] * a[1] + a[2] * a[2] + 1)) - 3.14;
-  // std::cout << "ground pitch: " << ground_pitch << std::endl;
+
   if (pz[0] < pz[2])
   {
     ground_pitch = -ground_pitch;
@@ -164,7 +165,7 @@ void NominalMPC::run(ControlFSMData &data)
     Pf = seResult.position +
          seResult.rBody.transpose() * pYawCorrected + seResult.vWorld * swingTimeRemaining[i];
 
-    double p_rel_max = 0.2;
+    double p_rel_max = 0.3;
     double pfx_rel = seResult.vWorld[0] * .5 * gait->_stance * dtMPC +
                      .03 * (seResult.vWorld[0] - v_des_world[0]) +
                      (0.5 * seResult.position[2] / 9.81) * (seResult.vWorld[1] * stateCommand->data.stateDes[11]);
@@ -215,8 +216,7 @@ void NominalMPC::run(ControlFSMData &data)
       data._legController->commands[foot].vDes = vDesLeg;
 
       data._legController->commands[foot].kpJoint.diagonal() = KpJoint;
-      data._legController->commands[foot].kdJoint.diagonal() << 2, 2, 2;
-      // account for early contact
+      data._legController->commands[foot].kdJoint.diagonal() = KdJointSwing;
       if (data._stateEstimator->getResult().contactEstimate(foot) != 0)
       {
         mpcTable[foot] = 1;
@@ -232,7 +232,7 @@ void NominalMPC::run(ControlFSMData &data)
       Vec3<double> vDesLeg = seResult.rBody * (vDesFootWorld - seResult.vWorld);
 
       data._legController->commands[foot].kpJoint.diagonal() << 0, 0, 0;
-      data._legController->commands[foot].kdJoint.diagonal() << 0.5, 0.5, 0.5;
+      data._legController->commands[foot].kdJoint.diagonal() = KdJointStance;
 
       data._legController->commands[foot].feedforwardForce = f_ff[foot];
 
@@ -286,9 +286,12 @@ void NominalMPC::run(ControlFSMData &data)
         trajAll[12 * i + 2] = trajAll[12 * (i - 1) + 2] + dtMPC * stateCommand->data.stateDes[11];
       }
     }
+    Timer t2;
+    t2.start();
     solver.update_problem_data(seResult.position.data(), seResult.vWorld.data(), seResult.orientation.data(),
                                seResult.omegaWorld.data(), r, seResult.rpy[2], Q.data(), trajAll, alpha, mpcTable);
 
+    // printf("MPC Solve time %f ms\n", t2.getMs());
     for (int leg = 0; leg < 4; leg++)
     {
       Vec3<double> f;
