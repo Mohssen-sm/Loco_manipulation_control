@@ -40,19 +40,23 @@ void FSMState_Walking::run()
 
     _data->_desiredStateCommand->setStateCommands(roll, pitch, v_des_body, turn_rate);
 
-    if (counter > 2000 && counter < 3500)
+    if (counter > 2000 && counter < 6000)
     {
-        _data->_quadruped->COM_height = 0.3 - ((counter - 2000) / 1500) * 0.1;
+        _data->_quadruped->COM_height = 0.3 - ((counter - 2000) / 4000) * 0.1;
     }
 
-    else if (counter > 3500 && counter < 5500)
+    else if (counter > 6000 && counter < 10000)
     {
         _data->_quadruped->COM_height = 0.2;
     }
 
-    else if (counter > 5500 && counter < 7000)
+    else if (counter > 10000 && counter < 14000)
     {
-        _data->_quadruped->COM_height = 0.2 + ((counter - 2000) / 1500) * 0.1;
+        _data->_quadruped->COM_height = 0.2 + ((counter - 10000) / 4000) * 0.1;
+    }
+
+    else{
+        _data->_quadruped->COM_height = 0.3;
     }
 
     Cmpc.climb = true;
