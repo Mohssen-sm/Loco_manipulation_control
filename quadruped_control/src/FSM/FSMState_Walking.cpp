@@ -42,21 +42,21 @@ void FSMState_Walking::run()
 
     if (counter > 2000 && counter < 6000)
     {
-        _data->_quadruped->COM_height = 0.3 - ((counter - 2000) / 4000) * 0.1;
+        _data->_quadruped->COM_height = 0.35 - ((counter - 2000.0) / 4000.0) * 0.1;
     }
 
     else if (counter > 6000 && counter < 10000)
     {
-        _data->_quadruped->COM_height = 0.2;
+        _data->_quadruped->COM_height = 0.25;
     }
 
-    else if (counter > 10000 && counter < 14000)
+    else if (counter > 10000 && counter < 16000)
     {
-        _data->_quadruped->COM_height = 0.2 + ((counter - 10000) / 4000) * 0.1;
+        _data->_quadruped->COM_height = 0.25 + ((counter - 10000.0) / 4000.0) * 0.1;
     }
 
     else{
-        _data->_quadruped->COM_height = 0.3;
+        _data->_quadruped->COM_height = 0.35;
     }
 
     Cmpc.climb = true;

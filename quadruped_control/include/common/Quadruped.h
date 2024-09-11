@@ -49,7 +49,7 @@ public:
         { // A1
             mass = 12;
             Ig << 0.0168, 0.0565, 0.064;
-            COM_height = 0.3;
+            COM_height = 0.35;
 
             leg_offset_x = 0.1805;
             leg_offset_y = 0.047;
@@ -65,7 +65,7 @@ public:
         { // Go1
             mass = 12.84;
             Ig << 0.0792, 0.2085, 0.2265;
-            COM_height = 0.3;
+            COM_height = 0.35;
 
             leg_offset_x = 0.1881;
             leg_offset_y = 0.04675;
